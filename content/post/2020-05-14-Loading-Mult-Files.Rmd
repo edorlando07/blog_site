@@ -1,0 +1,191 @@
+---
+title: "Loading Multiple Files from Various Folders Using R"
+author: "Ed Orlando"
+date: 2020-05-14
+categories: ["R"]
+tags: ["R Markdown", "tidyverse", "purrr", "readxl", "Spotify", "Exportify", "R Studio", "map", "function"]
+description: "This blog walks viewers through how to programmatically load multiple files from multiple folders using R.  It also shows them how to add the file and folder names to the tibble using the map function."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+### Author: Ed Orlando
+
+### Problem Statement
+
+This tutorial shows you how to load multiple files from multiple folders using R.  
+
+As a **bonus**, this article will also show you how to add the folder and file names to the final tibble.
+
+<br>
+
+### Load Libraries
+**Tidyverse** and **readxl** are the only libraries required for this tutorial.
+
+```{r, echo=TRUE, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+<br>
+
+### Data Description
+In this example, **Spotify playlist data** was downloaded using **[Exportify](<https://rawgit.com/watsonbox/exportify/master/exportify.html>)**.  Each .xlsx file contains information about the playlist including the artist name, track name, album name, and song duration.
+
+If you want to follow along and access the .xlsx files and the folder structure, click **[here](https://ed-orlando07.netlify.app/zip_files/Genres.zip)**.
+
+A sample of one of the the playlist data files is listed below.
+
+```{r, echo=FALSE, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+data_sample <- readxl::read_excel(path = "Data_Sources/2020_05_14_Loading_Mult_Files/Genres/Country/90s_country.xlsx")
+```
+```{r, echo=FALSE}
+data_sample %>% glimpse()
+```
+
+<br>
+
+### Folder Structure
+
+Each playlist was previously converted to a .xlsx file and placed into the appropriate genre's folder.  The three (3) genre folders include Country, Hip-Hop, and Rock.
+
+**Warning**: please make sure to update your paths below to represent your appropriate project paths.
+
+```{r}
+list.dirs(path = "Data_Sources/2020_05_14_Loading_Mult_Files/Genres/", 
+          full.names = FALSE, 
+          recursive  = FALSE)
+```
+
+<br>
+
+### File Structure
+
+Each genre folder included multiple playlist files.  The example below shows the three (3) playlists that exist inside the **Country genre folder**.
+
+```{r}
+list.files(path = "Data_Sources/2020_05_14_Loading_Mult_Files/Genres/Country/", 
+          full.names = FALSE, 
+          recursive  = FALSE)
+```
+
+<br>
+
+### Create Function to List All Files in Each Folder
+
+A custom function called **list_files_in_folder()** was created that lists the .xlsx files in each genre folder. 
+
+```{r, echo=TRUE}
+list_files_in_folder <- function(genre) {
+    list.files(path = str_c("Data_Sources/2020_05_14_Loading_Mult_Files/Genres/", genre),
+                          pattern = "*.xlsx", 
+                          full.names = TRUE) %>% 
+    tibble::enframe()
+}
+```
+
+<br>
+
+
+### View Files in Country Genre Folder
+For example, if we want to view all the files in the Country genre folder, we can now easily pass **"Country"** into the function.
+
+```{r}
+list_files_in_folder("Country")
+```
+
+<br>
+
+### Create Genre List
+Next, a **genre_list()** was created to include all three (3) genres.  This list allows us to map the **list_files_in_folder()** function to multiple genre folders later on.
+```{r}
+genre_list <- c("Country", "Hip_Hop", "Rock")
+```
+
+<br>
+
+### View All Files In All Genre Folders
+Using the **purrr::map_df()** function, we can pass the **genre_list()** into the **list_files_in_folder()** function.  The final result produces a tibble which includes all the playlists from all of the genre folders.
+
+```{r}
+playlist_tbl <- genre_list %>% 
+  purrr::map_df(list_files_in_folder)
+```
+
+As you can see below, the **playlist_tbl** now includes 9 observations.  Each of the three (3) genre folders includes three (3) playlist .xlsx files.  
+
+```{r}
+playlist_tbl
+```
+
+<br>
+
+### Extract "value" Column From playlist_tbl
+The value column was then selected from the **playlist_tbl** above and converted into a list.  
+
+```{r}
+playlist_list <- playlist_tbl %>%
+  select(value) %>%
+  as.list()
+
+playlist_list$value
+```
+
+<br>
+
+### Read All Excel Files and Add Folder and File Names
+
+The **playlist_list$value** was mapped into the function below which read and loaded each .xlsx file.  The code below also added the filename and entire path into a **new column** called **filename**.
+
+```{r results="hide", warning=FALSE, error=FALSE, message=FALSE}
+song_tbl <- playlist_list$value %>% 
+    map_df(function(add_file_name)
+        read_excel(add_file_name) %>%
+            mutate(playlist_name = gsub(".xlsx", 
+                                        "", 
+                                        basename(add_file_name))) %>%
+            mutate(filename = add_file_name)
+    )
+```
+
+```{r}
+song_tbl %>% 
+  glimpse()
+```
+
+<br>
+
+### Separate "filename" Column
+
+The entire path and filename were listed in the new **filename** column in the **song_tbl**.  Using the **separate()** function we can split out three (3) folders, Genre, and the Playlist into five (5) separate columns.
+
+```{r}
+song_tidy_tbl <- song_tbl %>% 
+            separate(col    = filename, 
+                     into   = c("Folder_01", 
+                                "Folder_02", 
+                                "Folder_03", 
+                                "Genre", 
+                                "Playlist"),
+                     sep    = "/",
+                     remove = FALSE)
+```
+
+<br>
+
+### Final Tidy Tibble
+
+The final tibble is complete and **tidy** with all **794 songs** listed.  
+```{r}
+song_tidy_tbl %>% 
+  glimpse()
+```
+
+<br>
+
+If you have questions or comments, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.
+
+If you want to check out my other data science articles, please check out my **[blog](<https://ed-orlando07.netlify.app/>)**.
+

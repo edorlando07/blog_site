@@ -6,10 +6,24 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 14 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Loading Multiple Files from Various Folders Using R</title>
+      <link>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</link>
+      <pubDate>Thu, 14 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</guid>
+      <description>Author: Ed OrlandoProblem StatementThis tutorial shows you how to load multiple files from multiple folders using R.
+As a bonus, this article will also show you how to add the folder and file names to the final tibble.
+
+Load LibrariesTidyverse and readxl are the only libraries required for this tutorial.
+library(tidyverse)library(readxl)
+Data DescriptionIn this example, Spotify playlist data was downloaded using Exportify.</description>
+    </item>
     
     <item>
       <title>Gratitude and Motivation</title>
@@ -17,7 +31,8 @@
       <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
       
       <guid>/2020/05/10/gratitude-and-motivation/</guid>
-      <description>Author: Ed OrlandoFirst, I want to give a shout out to the team at White Lodging. Our team leader Adam Hutsler and Business Intelligence Manager Max Thomas are always coming up with creative ways to solve complex problems and create business value using Tableau and R. I also want to thank former Business Intelligence team members, Alex Williams and Troy Hill for their encouragement and advice throughout the years.</description>
+      <description>Author: Ed Orlando
+First, I want to give a shout out to the team at White Lodging. Our team leader Adam Hutsler and Business Intelligence Manager Max Thomas are always coming up with creative ways to solve complex problems and create business value using Tableau and R. I also want to thank former Business Intelligence team members, Alex Williams and Troy Hill for their encouragement and advice throughout the years.</description>
     </item>
     
     <item>
