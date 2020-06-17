@@ -155,4 +155,4 @@ websites_tidy_tbl %>% glimpse()
 <br>
 For questions related to this analysis, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.  
 
-For access to more of my articles, please check out my **[blog](<https://ed-orlando07.netlify.app/>)**.
+For access to more of my articles, please check out my **[blog](<https://ed-orlando-07-blog-site.netlify.app/>)**.
