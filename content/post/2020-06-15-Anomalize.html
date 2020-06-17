@@ -58,6 +58,7 @@ library(readxl)</code></pre>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
 <p>The original raw web data file included in the project can be downloaded <strong><a href="https://www.kaggle.com/c/web-traffic-time-series-forecasting/data">here.</a></strong> The data was modified in a prior project I have offline because the original data file was very large (271 MB). I also created a couple lookup tables that create valuable features later in the pipeline.</p>
+<p>To follow along, click <strong><a href="https://ed-orlando-07-blog-site.netlify.app/zip_files/Anomalize.zip">here</a></strong> to download the sample files.</p>
 <pre class="r"><code># 2.0 LOAD DATA ----
 websites_sample_tbl &lt;- vroom::vroom(&quot;Data_Sources/2020_06_15_Anomalize/websites_sample_tbl.csv&quot;, delim = &quot;,&quot;)
 page_summary_lkp_tbl &lt;- read_xlsx(&quot;Data_Sources/2020_06_15_Anomalize/Topics_Dates_LKP.xlsx&quot;, sheet = &quot;Sheet1&quot;)

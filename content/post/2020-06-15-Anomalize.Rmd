@@ -71,6 +71,8 @@ library(readxl)
 
 The original raw web data file included in the project can be downloaded **[here.](<https://www.kaggle.com/c/web-traffic-time-series-forecasting/data>)**  The data was modified in a prior project I have offline because the original data file was very large (271 MB).  I also created a couple lookup tables that create valuable features later in the pipeline.  
 
+To follow along, click **[here](https://ed-orlando-07-blog-site.netlify.app/zip_files/Anomalize.zip)** to download the sample files.
+
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 # 2.0 LOAD DATA ----
 websites_sample_tbl <- vroom::vroom("Data_Sources/2020_06_15_Anomalize/websites_sample_tbl.csv", delim = ",")
