@@ -6,10 +6,23 @@
     <description>Recent content in R Markdown on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 14 May 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r-markdown/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Build a Spotify Playlist Recommendation Model Using R</title>
+      <link>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</link>
+      <pubDate>Mon, 18 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</guid>
+      <description>Author: Ed OrlandoRecognition &amp;amp; CreditThis article and its contents were heavily influenced by Matt Dancho’s Learning Labs Pro: Session #11.
+
+Interactive Playlist ApplicationIf you are interested in creating your own playlist, please check out the Spotify Playlist Recommendation Shiny App.
+
+Problem StatementMany companies and products you interact with every day include some type of Recommendation system. For example, the Netflix app recommends movies based on your history and what is trending.</description>
+    </item>
     
     <item>
       <title>Loading Multiple Files from Various Folders Using R</title>
