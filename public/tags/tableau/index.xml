@@ -6,10 +6,28 @@
     <description>Recent content in Tableau on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Feb 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/tableau/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Gratitude and Motivation</title>
+      <link>/2020/05/10/gratitude-and-motivation/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/05/10/gratitude-and-motivation/</guid>
+      <description>Author: Ed OrlandoFirst, I want to give a shout out to the team at White Lodging. Our team leader Adam Hutsler and Business Intelligence Manager Max Thomas are always coming up with creative ways to solve complex problems and create business value using Tableau and R. I also want to thank former Business Intelligence team members, Alex Williams and Troy Hill for their encouragement and advice throughout the years.</description>
+    </item>
+    
+    <item>
+      <title>Gratitude and Motivation</title>
+      <link>/2020/05/10/gratitude-and-motivation/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/05/10/gratitude-and-motivation/</guid>
+      <description>Author: Ed OrlandoFirst, I want to give a shout out to the team at White Lodging. Our team leader Adam Hutsler and Business Intelligence Manager Max Thomas are always coming up with creative ways to solve complex problems and create business value using Tableau and R. I also want to thank former Business Intelligence team members, Alex Williams and Troy Hill for their encouragement and advice throughout the years.</description>
+    </item>
     
     <item>
       <title>What Separates the Top PGA Tour Players from the Rest of the Field</title>

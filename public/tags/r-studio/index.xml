@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>R on A Hugo website</title>
-    <link>/categories/r/</link>
-    <description>Recent content in R on A Hugo website</description>
+    <title>R Studio on A Hugo website</title>
+    <link>/tags/r-studio/</link>
+    <description>Recent content in R Studio on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/r-studio/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -27,18 +27,6 @@
       
       <guid>/2020/05/10/gratitude-and-motivation/</guid>
       <description>Author: Ed OrlandoFirst, I want to give a shout out to the team at White Lodging. Our team leader Adam Hutsler and Business Intelligence Manager Max Thomas are always coming up with creative ways to solve complex problems and create business value using Tableau and R. I also want to thank former Business Intelligence team members, Alex Williams and Troy Hill for their encouragement and advice throughout the years.</description>
-    </item>
-    
-    <item>
-      <title>What Separates the Top PGA Tour Players from the Rest of the Field</title>
-      <link>/2019/02/11/what-separates-the-top-pga-tour-players-from-the-rest-of-the-field/</link>
-      <pubDate>Mon, 11 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/2019/02/11/what-separates-the-top-pga-tour-players-from-the-rest-of-the-field/</guid>
-      <description>Author: Ed OrlandoThis article identifies what separates the top PGA Tour players from the rest of the competition using H2O and LIME.
-The article and visualizations were produced using Tableau Public and the predictions and explainable machine learning techniques were performed in R.
-Click here for the full article.
-</description>
     </item>
     
   </channel>
