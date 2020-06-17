@@ -187,5 +187,5 @@ song_tidy_tbl %>%
 
 If you have questions or comments, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.
 
-If you want to check out my other data science articles, please check out my **[blog](<https://ed-orlando07-blog-site.netlify.app/>)**.
+If you want to check out my other data science articles, please check out my **[blog](<https://ed-orlando-07-blog-site.netlify.app/>)**.
 
