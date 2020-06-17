@@ -4,7 +4,47 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-06-03T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/anomalize/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/business-science-university/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/readxl/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/tableau/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/tidyverse/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/06/15/website-anomaly-detection-using-r-tableau/</loc>
+    <lastmod>2020-06-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -53,22 +93,12 @@
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2020-06-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/2020/06/03/predicting-employee-attrition-using-r/</loc>
     <lastmod>2020-06-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/r/</loc>
-    <lastmod>2020-06-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/readxl/</loc>
     <lastmod>2020-06-03T00:00:00+00:00</lastmod>
   </url>
   
@@ -88,17 +118,7 @@
   </url>
   
   <url>
-    <loc>/tags/</loc>
-    <lastmod>2020-06-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/tidyquant/</loc>
-    <lastmod>2020-06-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/tidyverse/</loc>
     <lastmod>2020-06-03T00:00:00+00:00</lastmod>
   </url>
   
@@ -165,16 +185,6 @@
   <url>
     <loc>/2020/05/10/gratitude-and-motivation/</loc>
     <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/tableau/</loc>
-    <lastmod>2020-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/business-science-university/</loc>
-    <lastmod>2019-02-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>

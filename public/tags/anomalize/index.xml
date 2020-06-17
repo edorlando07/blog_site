@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Business Science University on A Hugo website</title>
-    <link>/tags/business-science-university/</link>
-    <description>Recent content in Business Science University on A Hugo website</description>
+    <title>anomalize on A Hugo website</title>
+    <link>/tags/anomalize/</link>
+    <description>Recent content in anomalize on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 15 Jun 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/business-science-university/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/anomalize/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -19,18 +19,6 @@
       <guid>/2020/06/15/website-anomaly-detection-using-r-tableau/</guid>
       <description>Written by: Ed Orlando, Data ScientistProject DescriptionAnomaly detection can be valuable in many ways. For example, anomalies can be used to detect fraud, better understand system health monitoring, or help data engineers identify spikes in website traffic. It can also be used to remove extreme outliers from datasets before modeling.
 In this project, we identified webpage traffic outliers. The webpages analyzed are from the calendar year 2016 and focus on popular United States sports, entertainment, and political events and people.</description>
-    </item>
-    
-    <item>
-      <title>What Separates the Top PGA Tour Players from the Rest of the Field</title>
-      <link>/2019/02/11/what-separates-the-top-pga-tour-players-from-the-rest-of-the-field/</link>
-      <pubDate>Mon, 11 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/2019/02/11/what-separates-the-top-pga-tour-players-from-the-rest-of-the-field/</guid>
-      <description>Author: Ed OrlandoThis article identifies what separates the top PGA Tour players from the rest of the competition using H2O and LIME.
-The article and visualizations were produced using Tableau Public and the predictions and explainable machine learning techniques were performed in R.
-Click here for the full article.
-</description>
     </item>
     
   </channel>

@@ -6,10 +6,55 @@
     <description>Recent content in Tags on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 03 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 15 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>anomalize</title>
+      <link>/tags/anomalize/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/anomalize/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Business Science University</title>
+      <link>/tags/business-science-university/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/business-science-university/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>readxl</title>
+      <link>/tags/readxl/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/readxl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tableau</title>
+      <link>/tags/tableau/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/tableau/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tidyverse</title>
+      <link>/tags/tidyverse/</link>
+      <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/tidyverse/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>correlationfunnel</title>
@@ -84,15 +129,6 @@
     </item>
     
     <item>
-      <title>readxl</title>
-      <link>/tags/readxl/</link>
-      <pubDate>Wed, 03 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/readxl/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>scales</title>
       <link>/tags/scales/</link>
       <pubDate>Wed, 03 Jun 2020 00:00:00 +0000</pubDate>
@@ -125,15 +161,6 @@
       <pubDate>Wed, 03 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>/tags/tidyquant/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>tidyverse</title>
-      <link>/tags/tidyverse/</link>
-      <pubDate>Wed, 03 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/tidyverse/</guid>
       <description></description>
     </item>
     
@@ -224,24 +251,6 @@
       <pubDate>Thu, 14 May 2020 00:00:00 +0000</pubDate>
       
       <guid>/tags/spotify/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tableau</title>
-      <link>/tags/tableau/</link>
-      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/tableau/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Business Science University</title>
-      <link>/tags/business-science-university/</link>
-      <pubDate>Mon, 11 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/business-science-university/</guid>
       <description></description>
     </item>
     
