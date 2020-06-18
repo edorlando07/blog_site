@@ -68,7 +68,7 @@
 
   <article class="article">
     
-    <span class="article-duration">6 min read</span>
+    <span class="article-duration">5 min read</span>
     
 
     <h1 class="article-title">Website Anomaly Detection Using R &amp; Tableau</h1>
@@ -86,24 +86,14 @@
 <div id="project-description" class="section level2">
 <h2>Project Description</h2>
 <p>Anomaly detection can be valuable in many ways. For example, anomalies can be used to detect fraud, better understand system health monitoring, or help data engineers identify spikes in website traffic. It can also be used to remove extreme outliers from datasets before modeling.</p>
-<p>In this project, we identified webpage traffic outliers. The webpages analyzed are from the calendar year 2016 and focus on popular United States sports, entertainment, and political events and people.</p>
-<p>This project applied the <strong><a href="https://business-science.github.io/anomalize/">anomalize</a></strong> package developed by <strong><a href="https://www.linkedin.com/in/mattdancho/">Matt Dancho</a></strong> and <strong><a href="https://www.linkedin.com/in/davis-vaughan/">Davis Vaughan</a></strong>.
+<p>In this project, webpage traffic outliers were identified that utilized data from the calendar year 2016. The project focused on popular United States sports, entertainment, and political events and people.</p>
+<p>This project applied the <strong><a href="https://business-science.github.io/anomalize/">anomalize</a></strong> package to assist in identifying outliers.
 <br><br></p>
 </div>
 <div id="interactive-tableau-public-viz" class="section level2">
 <h2>Interactive Tableau Public Viz</h2>
-<p>A Tableau interactive viz was created that utilized the final tidy tibble that is produced in this tutorial. It can be viewed by clicking the link below.</p>
+<p>A Tableau interactive viz was created that used the final output produced in this project. The interactive viz can be viewed by clicking the link below.</p>
 <p><strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">Website Anomaly Detection App</a></strong>.
-<br><br></p>
-</div>
-<div id="acknowledgement" class="section level2">
-<h2>Acknowledgement</h2>
-<p>I want to thank and give credit to <strong><a href="https://www.linkedin.com/in/mattdancho/">Matt Dancho</a></strong>, CEO and Founder of <strong><a href="https://www.business-science.io/">Business Science University</a></strong>. The concepts taught in Learning Lab #12 were heavily implemented in this project.
-<br><br></p>
-</div>
-<div id="why-is-the-anomalize-package-so-useful" class="section level2">
-<h2>Why is the Anomalize Package So Useful?</h2>
-<p>The <strong><a href="https://business-science.github.io/anomalize/">anomalize</a></strong> package is extremely useful because it helped identify outliers, and, more importantly it also accounted for trend and seasonality patterns often found in time series data.
 <br><br></p>
 </div>
 <div id="load-libraries" class="section level2">
@@ -122,14 +112,14 @@ library(readxl)</code></pre>
 </div>
 <div id="load-data" class="section level2">
 <h2>Load Data</h2>
-<p>The original raw web data file included in the project can be downloaded <strong><a href="https://www.kaggle.com/c/web-traffic-time-series-forecasting/data">here.</a></strong> The data was modified in a prior project I have offline because the original data file was very large (271 MB). I also created a couple lookup tables that create valuable features later in the pipeline.</p>
+<p>The original raw web data file included in the project can be downloaded <strong><a href="https://www.kaggle.com/c/web-traffic-time-series-forecasting/data">here.</a></strong> The raw data was modified in a prior project I have offline since the original raw data file was very large (271 MB). I also created a couple lookup tables that create valuable features later in the pipeline.</p>
 <p>To follow along, click <strong><a href="https://ed-orlando-07-blog-site.netlify.app/zip_files/Anomalize.zip">here</a></strong> to download the sample files.</p>
 <pre class="r"><code># 2.0 LOAD DATA ----
 websites_sample_tbl &lt;- vroom::vroom(&quot;Data_Sources/2020_06_15_Anomalize/websites_sample_tbl.csv&quot;, delim = &quot;,&quot;)
 page_summary_lkp_tbl &lt;- read_xlsx(&quot;Data_Sources/2020_06_15_Anomalize/Topics_Dates_LKP.xlsx&quot;, sheet = &quot;Sheet1&quot;)
 topics_dates_lkp_tbl &lt;- read_xlsx(&quot;Data_Sources/2020_06_15_Anomalize/Topics_Dates_LKP.xlsx&quot;, sheet = &quot;Sheet2&quot;)</code></pre>
 <p><br></p>
-<p>A sample of the three (3) tibbles is listed below. They tibbles include information related to website traffic visits, the topic summary, details about the outliers, and the sources and links to the details.</p>
+<p>Subsets of the three (3) tibbles are listed below. The tibbles include information related to website traffic visits, the topic summary, details about the outliers, and the sources and links to the details.</p>
 <pre class="r"><code>head(websites_sample_tbl)
 ## # A tibble: 6 x 4
 ##    ...1 date       visits Page_Summary
@@ -197,20 +187,20 @@ websites_anomalies_tbl &lt;- websites_sample_tbl %&gt;%
 ## $ recomposed_l1 &lt;dbl&gt; -1135.359, -1120.340, -1097.671, -1085.949, -1140.264...
 ## $ recomposed_l2 &lt;dbl&gt; 2785.368, 2800.387, 2823.056, 2834.778, 2780.463, 276...</code></pre>
 <p><br></p>
-<p>Finally, an example of the anomalies viewed in R is listed below. The anomalize package includes a plot_anomalies() function that easily identifies the outlies.</p>
-<p>In 2016, the Chicago Cubs were in the playoffs and eventually won the World Series. The popularity of that event is extremely apparent in the visual below.</p>
+<p>Finally, an example of the anomalies viewed in R is listed below. The anomalize package includes a plot_anomalies() function that easily identifies the outliers.</p>
+<p>In 2016, the Chicago Cubs were in the playoffs and eventually won the World Series. The popularity of that event is obviously apparent in the visual below.</p>
 <pre class="r"><code>websites_anomalies_tbl %&gt;%
   filter(Page_Summary == &quot;Chicago_Cubs&quot;) %&gt;%
   filter(date &gt;= as.Date(&quot;2016-01-01&quot;)) %&gt;%
   plot_anomalies(ncol = 2, time_recomposed = TRUE)</code></pre>
 <p><img src="/post/2020-06-15-Anomalize_files/figure-html/unnamed-chunk-8-1.png" width="100%" /></p>
-<p>To view the fully interactive Tabelau Public viz with all 2016 popular topics listed, please click <strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">here.</a></strong></p>
+<p>To view the fully interactive Tableau Public viz with all 2016 popular topics listed, please click <strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">here.</a></strong></p>
 <p><br>
 <br></p>
 </div>
 <div id="final-tidy-tibble-with-proper-titles-descriptions" class="section level2">
 <h2>Final Tidy Tibble With Proper Titles &amp; Descriptions</h2>
-<p>Finally, we can add the web page Category, Proper Title, Description of Outlier Event, and the Source. This tibble is what is exported and loaded into the Tableau Public viz, which can be viewed <strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">here.</a></strong></p>
+<p>Finally, we can add the web page Category, Proper Title, Description of Outlier Event, and the Source. This tibble is what is exported and loaded into the Tableau Public viz.</p>
 <pre class="r"><code>websites_tidy_tbl &lt;- websites_anomalies_tbl %&gt;%
     left_join(page_summary_lkp_tbl) %&gt;%
     left_join(topics_dates_lkp_tbl)</code></pre>

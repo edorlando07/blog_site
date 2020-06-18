@@ -29,25 +29,16 @@ Written by: Ed Orlando, Data Scientist
 ## Project Description
 Anomaly detection can be valuable in many ways.  For example, anomalies can be used to detect fraud, better understand system health monitoring, or help data engineers identify spikes in website traffic.  It can also be used to remove extreme outliers from datasets before modeling.
 
-In this project, we identified webpage traffic outliers.  The webpages analyzed are from the calendar year 2016 and focus on popular United States sports, entertainment, and political events and people.       
+In this project, webpage traffic outliers were identified that utilized data from the calendar year 2016.  The project focused on popular United States sports, entertainment, and political events and people.       
 
-This project applied the **[anomalize](<https://business-science.github.io/anomalize/>)** package developed by **[Matt Dancho](<https://www.linkedin.com/in/mattdancho/>)** and **[Davis Vaughan](<https://www.linkedin.com/in/davis-vaughan/>)**.
+This project applied the **[anomalize](<https://business-science.github.io/anomalize/>)** package to assist in identifying outliers.
 <br><br>
 
 ## Interactive Tableau Public Viz
-A Tableau interactive viz was created that utilized the final tidy tibble that is produced in this tutorial.  It can be viewed by clicking the link below.
+A Tableau interactive viz was created that used the final output produced in this project.  The interactive viz can be viewed by clicking the link below.
 
 **[Website Anomaly Detection App](<https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection>)**.
 <br><br>
-
-## Acknowledgement
-I want to thank and give credit to **[Matt Dancho](<https://www.linkedin.com/in/mattdancho/>)**, CEO and Founder of **[Business Science University](<https://www.business-science.io/>)**.  The concepts taught in Learning Lab #12 were heavily implemented in this project.
-<br><br>
-
-## Why is the Anomalize Package So Useful?
-The **[anomalize](<https://business-science.github.io/anomalize/>)** package is extremely useful because it helped identify outliers, and, more importantly it also accounted for trend and seasonality patterns often found in time series data.
-<br><br>
-
 
 ## Load Libraries
 
@@ -69,7 +60,7 @@ library(readxl)
 
 ## Load Data
 
-The original raw web data file included in the project can be downloaded **[here.](<https://www.kaggle.com/c/web-traffic-time-series-forecasting/data>)**  The data was modified in a prior project I have offline because the original data file was very large (271 MB).  I also created a couple lookup tables that create valuable features later in the pipeline.  
+The original raw web data file included in the project can be downloaded **[here.](<https://www.kaggle.com/c/web-traffic-time-series-forecasting/data>)**  The raw data was modified in a prior project I have offline since the original raw data file was very large (271 MB).  I also created a couple lookup tables that create valuable features later in the pipeline.  
 
 To follow along, click **[here](https://ed-orlando-07-blog-site.netlify.app/zip_files/Anomalize.zip)** to download the sample files.
 
@@ -81,7 +72,7 @@ topics_dates_lkp_tbl <- read_xlsx("Data_Sources/2020_06_15_Anomalize/Topics_Date
 ```
 <br>
 
-A sample of the three (3) tibbles is listed below.  They tibbles include information related to website traffic visits, the topic summary, details about the outliers, and the sources and links to the details. 
+Subsets of the three (3) tibbles are listed below.  The tibbles include information related to website traffic visits, the topic summary, details about the outliers, and the sources and links to the details. 
 
 ```{r}
 head(websites_sample_tbl)
@@ -123,9 +114,9 @@ websites_anomalies_tbl %>% glimpse()
 
 <br>
 
-Finally, an example of the anomalies viewed in R is listed below. The anomalize package includes a plot_anomalies() function that easily identifies the outlies.
+Finally, an example of the anomalies viewed in R is listed below. The anomalize package includes a plot_anomalies() function that easily identifies the outliers.
 
-In 2016, the Chicago Cubs were in the playoffs and eventually won the World Series.  The popularity of that event is extremely apparent in the visual below. 
+In 2016, the Chicago Cubs were in the playoffs and eventually won the World Series.  The popularity of that event is obviously apparent in the visual below. 
 ```{r}
 websites_anomalies_tbl %>%
   filter(Page_Summary == "Chicago_Cubs") %>%
@@ -133,14 +124,14 @@ websites_anomalies_tbl %>%
   plot_anomalies(ncol = 2, time_recomposed = TRUE)
 ```
 
-To view the fully interactive Tabelau Public viz with all 2016 popular topics listed, please click **[here.](<https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection>)**
+To view the fully interactive Tableau Public viz with all 2016 popular topics listed, please click **[here.](<https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection>)**
 
 <br>
 <br>
 
 ## Final Tidy Tibble With Proper Titles & Descriptions
 
-Finally, we can add the web page Category, Proper Title, Description of Outlier Event, and the Source.  This tibble is what is exported and loaded into the Tableau Public viz, which can be viewed **[here.](<https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection>)**
+Finally, we can add the web page Category, Proper Title, Description of Outlier Event, and the Source.  This tibble is what is exported and loaded into the Tableau Public viz.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 websites_tidy_tbl <- websites_anomalies_tbl %>%
