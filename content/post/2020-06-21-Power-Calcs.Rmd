@@ -1,0 +1,316 @@
+---
+title: "Examining Power Calculations Using R"
+author: "Ed Orlando"
+date: '2020-06-21'
+categories: ["R"]
+tags: ["R Markdown", "Power Calculations", "R Studio", "power.t.test"]
+description: ""
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+Author: Ed Orlando
+  
+## Introduction & Problem Statement
+Calculating sample sizes while accounting for power is fairly straight-forward if you have all the required inputs.  Many universities have online calculators that help you determine the appropriate sample size. The variables needed to calculate the sample size while accounting for power are listed below.  This article will utilize **[Cohen's d](<https://www.socscistatistics.com/effectsize/default3.aspx>)** calculations in the examples presented.  If you are unfamiliar with any of the terms below, please click on any of the symbols for more information.  
+
+* Significance Level **[$\alpha$](<https://www.statisticsteacher.org/2017/09/15/what-is-power/>)**  
+* Power **[(1 - $\beta$)](<https://www.statisticsteacher.org/2017/09/15/what-is-power/>)**  
+* Mean difference of the two distributions **[$\mu$<sub>d</sub>](<https://machinelearningmastery.com/effect-size-measures-in-python/>)** 
+* Pooled standard deviation of the two distributions **[$\sigma$<sub>d</sub>](<https://machinelearningmastery.com/effect-size-measures-in-python/>)**  
+* Effect Size **[$\mu$<sub>d</sub> / $\sigma$<sub>d</sub>](<https://machinelearningmastery.com/effect-size-measures-in-python/>)**
+
+In this type of problem, the significance level and power variables should be pre-determined and two common values are traditionally set at 0.05 and 0.80, respectively.  
+
+The effect size is calculated by estimating or assuming the mean difference and pooled standard deviation of the two groups.  Estimating the **effect size** is often the **most challenging** part of the analysis because the data and, thus, the distribution of that data may not exist.
+
+**[Roger D. Peng](<http://www.biostat.jhsph.edu/~rpeng/>)** and **[Hilary Parker](<https://hilaryparker.com/about-hilary-parker/>)** talk about this problem at great length in their book called *[Conversations on Data Science](<https://leanpub.com/conversationsondatascience>)*.  
+
+In the book, they agree that in biostats, sample sizes are often pre-determined based on the budget.  They also point to the fact that a lot of time is typically spent estimating an appropriate effect size. Therefore, in practice, most biostatisticians actually back into the power calculation once they have determined the appropriate effect size and know what the sample size will be.  
+
+<br>
+
+## Solution Statement
+This article does not go into great detail about how deal with challenges of estimating effect sizes.  It does, however, offer three data sets and shows how various effect sizes can dramatically influence the sample sizes required to uphold the significance and the power levels.  
+
+The article will also walk you through how to calculate the appropriate sample size step-by-step in R.  
+
+Lastly, this article lists some incredible references that go into more detail about the math as well as some of the pitfalls biostatisticians run into when calculating power, effect size, and sample size. 
+<br>
+
+## Load Libraries
+To get started, let's load the libraries listed below.
+```{r, echo=TRUE, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+library(tidyquant)
+library(grid)
+```
+
+<br>
+
+## Sample Size Calculation Components
+Next, we need to assume or calculate the following metrics on each of our two groups (Group A and Group B.  The items and the definitions are listed below.  
+
+* $\alpha$ = significance level (traditionally set at 0.05)  
+* (1 - $\beta$) = power (traditionally set at = 0.80)
+
+* $\mu$<sub>a</sub> = population mean Group A  
+* $\mu$<sub>b</sub> = population mean Group B  
+* $\mu$<sub>d</sub> = population mean difference $\mu$<sub>a</sub> - $\mu$<sub>b</sub>
+
+* $\sigma$<sub>a</sub> = standard deviation Group A  
+* $\sigma$<sub>b</sub> = standard deviation Group B  
+* $\sigma$<sub>d</sub> = population standard deviation of the paired difference  
+
+* $\mu$<sub>d</sub> / $\sigma$<sub>d</sub> = effect size
+
+<br>
+
+## Significance Level and Power Inputs
+As stated above, these inputs can be determined prior to the study and the values listed below are traditionally used in practice.  However, please note any one of these values can also be calculated if all other items are known.  For this article, we will assume a significance level of 0.05 and a power of 0.80 for all three examples.
+```{r}
+sign_level    <- 0.05
+pwr           <- 0.80
+```
+
+## Data Distributions of the Two Groups 
+The other items that affect each group's appropriate sample sizes is the distribution of the data.  In other words, we need to know the means and the standard deviations of the two groups before we can determine the appropriate sample size.  
+
+As noted before, this is typically the hardest part of the calculation, because often the distributions of the two sets are unknown.  However, there are ways to estimate the distributions of the two groups.  Some common methods include:  
+
+* Use estimates from previous studies or research previously.  This may not be available.  
+* Run a pilot study.  This may be expensive.  
+* Ask subject matter experts to estimate the distribution based on best-guess.  This will have the most uncertainty.  
+
+Source: https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf    
+
+## Create Multiple Sample Data Sets
+In this article, we do not have access to actual data, so we will use dummy data instead. We can create three (3) sample data sets that are normally distributed that assume the same significance level, power, and standard deviations.  However, the data sets will include various mean differences.   
+
+```{r}
+set.seed(1234)
+
+data_set_01 <- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 1.10, sd = 1.20))
+
+data_set_02 <- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 2.50, sd = 1.20)) 
+
+data_set_03 <- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 4.50, sd = 1.20))
+
+data_set_01 <- data_set_01 %>%
+  mutate(data_group = "data_set_01")
+
+data_set_02 <- data_set_02 %>% 
+  mutate(data_group = "data_set_02")
+
+data_set_03 <- data_set_03 %>% 
+  mutate(data_group = "data_set_03")
+```
+
+<br>
+
+## Union Data Sets
+Let's stack the data sets on top of one another so that we can appropriately add more calculated fields to the data set.
+```{r}
+mult_data_set <- rbind(data_set_01, data_set_02, data_set_03) %>%
+  select(data_group, everything())
+```
+
+Let's take a look at the sample data set.
+
+```{r}
+head(mult_data_set)
+```
+
+<br>
+
+## Additional Calculations in R
+Before we can calculate the sample size for each group, we need to calculate the mean difference and the pooled standard deviation.  We will also calculate the effect size.
+```{r}
+mult_data_set_calcs <- mult_data_set %>%
+  group_by(data_group) %>%
+  mutate(mean_A = mean(group_A),
+         mean_B = mean(group_B),
+         mean_diff = abs(mean_A - mean_B),
+         sd_A   = sd(group_A),
+         sd_B   = sd(group_B),
+         pooled_sd = sqrt((sd_A^2 + sd_B^2)/2),
+         eff_size = mean_diff / pooled_sd
+         ) %>%
+  add_tally() %>%
+  ungroup() %>%
+  select(data_group, everything())
+```
+
+Let's take a look at what the data set looks like now.
+
+```{r}
+mult_data_set_calcs %>% glimpse()
+```
+
+<br>
+
+## Mean Difference & Pooled Standard Deviation
+The mean difference and the pooled standard deviation values are extracted from the tibbles.  These individual values will be plugged into the **[power.t.test()](<https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/power.t.test>)** function in the next step.  We will also extract the effect size so that it can be included in the graphs later on.
+
+```{r}
+data_set_01 <- mult_data_set_calcs %>% 
+  filter(data_group == "data_set_01")
+
+data_set_02 <- mult_data_set_calcs %>% 
+  filter(data_group == "data_set_02")
+
+data_set_03 <- mult_data_set_calcs %>% 
+  filter(data_group == "data_set_03")
+
+mean_diff_01 <- data_set_01$mean_diff[[1]]
+pooled_sd_01 <- data_set_01$pooled_sd[[1]]
+eff_size_01  <- data_set_01$eff_size[[1]]
+
+mean_diff_02 <- data_set_02$mean_diff[[1]]
+pooled_sd_02 <- data_set_02$pooled_sd[[1]]
+eff_size_02  <- data_set_02$eff_size[[1]]
+
+mean_diff_03 <- data_set_03$mean_diff[[1]]
+pooled_sd_03 <- data_set_03$pooled_sd[[1]]
+eff_size_03  <- data_set_03$eff_size[[1]]
+```
+
+<br>
+
+## Calculate the Appropriate Sample Size
+Now that we have all the individual pieces for each data set, we can estimate the sample size for the 3 various distributions using the power.t.test() function.
+
+```{r}
+power_test_01  <- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_01,
+                               delta     = mean_diff_01,
+                               power     = pwr)
+
+power_test_02  <- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_02,
+                               delta     = mean_diff_02,
+                               power     = pwr)
+
+power_test_03  <- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_03,
+                               delta     = mean_diff_03,
+                               power     = pwr)
+```
+
+In order to properly preserve the power and significance levels, we round the sample size up.
+
+```{r}
+number_each_group_01 <- ceiling(power_test_01$n)
+number_each_group_02 <- ceiling(power_test_02$n)
+number_each_group_03 <- ceiling(power_test_03$n)
+```
+
+Additionally, we need to convert those values into a tibble format, so that they can be labeled in the distribution charts later on.
+
+```{r}
+n_01 <- tibble(data_group = c("data_set_01"),
+               n_per_group = number_each_group_01)
+
+n_02 <- tibble(data_group = c("data_set_02"),
+               n_per_group = number_each_group_02)
+
+n_03 <- tibble(data_group = c("data_set_03"),
+               n_per_group = number_each_group_03)
+
+n_all_sets <- rbind(n_01, n_02, n_03)
+```
+
+<br>
+
+## Tidy Up the Data
+
+Before we graph the distributions, let's make the data tidy.
+
+```{r}
+metrics_by_data_set <- mult_data_set_calcs %>%
+  select(data_group, mean_diff, pooled_sd, eff_size, n) %>%
+  distinct()
+
+mult_data_set_tidy_tbl <- mult_data_set %>%
+  pivot_longer(
+    cols = -data_group,
+    names_to = "group",
+    values_to = "value"
+  ) %>%
+  left_join(metrics_by_data_set) %>%
+  left_join(n_all_sets)
+```
+
+A sample of the tidy tibble is listed below.
+
+```{r}
+mult_data_set_tidy_tbl %>% glimpse()
+```
+
+## Graphically Compare the Inputs and Results
+
+Now that the data is tidy, we can graphically compare and contrast the results of three different data sets.
+
+```{r, results="hide"}
+ggplot(mult_data_set_tidy_tbl, aes(x = value, fill = group)) +
+  geom_density(alpha = .95) +
+  scale_color_grey() +
+  scale_fill_grey(start = 0.5, end = 0.80) +
+  theme_classic() +
+  theme(legend.position="bottom") +
+  guides(fill=guide_legend("")) +
+  labs(title = "Distribution Comparison",
+       subtitle = "p-value = 0.05, Power = 0.80") +
+  
+  facet_wrap(~ data_group) +
+  
+  geom_text(
+    data = mult_data_set_tidy_tbl,
+    mapping = aes(x = -2.00, 
+                  y = 0.07,
+                  hjust = 0,
+                  label = str_c("Mean Diff = ", format(mean_diff, digits = 2), "\n", 
+                                "Pooled StDev = ", format(pooled_sd, digits = 2), "\n",
+                                "Effect Size = ", format(eff_size, digits = 2), "\n",
+                                "N Size = ", format(n_per_group, digits = 0))))
+```
+
+<br>
+
+## Final Conclusions, Analysis, and Thoughts
+As witnessed in the graph above, the effect size can dramatically impact the sample size required to uphold the power and significance levels in a study.  Moving from left to right, one can see that as there becomes less and less overlap in the two groups, and the n size starts to decrease.  In other words, if a smaller effect size is requested, the number of observations required will increase.  Larger sample sizes are pretty cheap in tech companies testing website traffic patterns, so it may not be an issue.  However, requiring larger sample size in a field like biostatistics can be a problem since experimental type data is often very costly.
+
+As mentioned earlier, calculating the sample size can be a much more complicated analysis if some of the data is unknown.  Estimating the mean differences, and standard deviations of the two groups is often a collective effort that involves statisticians as well as subject matter experts.
+
+If you are interested in learning more about power calculations and all its parts, please check out the awesome references below.
+
+## References
+* Title:  Power Analysis, Clearly Explained  
+* Author: Josh Starmer  
+* Link:   https://www.youtube.com/watch?v=VX_M3tIyiYk&feature=youtu.be
+
+<hr>
+
+* Title:  Statistical Power, Clearly Explained  
+* Author: Josh Starmer  
+* Link:   https://www.youtube.com/watch?v=Rsc5znwR5FA&feature=youtu.be
+
+<hr>
+
+* Title:  BMI 541/699 Lecture 13  
+* Link:   https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf
+
+<hr>  
+
+* Title:  Conversations on Data Science  
+* Author: Roger D. Peng & Hilary Parker
+* Link:   https://leanpub.com/conversationsondatascience

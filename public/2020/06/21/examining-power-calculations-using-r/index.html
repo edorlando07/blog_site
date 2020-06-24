@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.72.0" />
+
+
+<title>Examining Power Calculations Using R - A Hugo website</title>
+<meta property="og:title" content="Examining Power Calculations Using R - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="75"
+         height="75"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://ed-orlando07-home.netlify.app/">@Home</a></li>
+    
+    <li><a href="/">Blog</a></li>
+    
+    <li><a href="https://ed-orlando07.netlify.app/pdfs/CV_Orlando.pdf">CV</a></li>
+    
+    <li><a href="https://github.com/edorlando07/blog_site">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">9 min read</span>
+    
+
+    <h1 class="article-title">Examining Power Calculations Using R</h1>
+
+    
+    <span class="article-date">2020-06-21</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Author: Ed Orlando</p>
+<div id="introduction-problem-statement" class="section level2">
+<h2>Introduction &amp; Problem Statement</h2>
+<p>Calculating sample sizes while accounting for power is fairly straight-forward if you have all the required inputs. Many universities have online calculators that help you determine the appropriate sample size. The variables needed to calculate the sample size while accounting for power are listed below. This article will utilize <strong><a href="https://www.socscistatistics.com/effectsize/default3.aspx">Cohen’s d</a></strong> calculations in the examples presented. If you are unfamiliar with any of the terms below, please click on any of the symbols for more information.</p>
+<ul>
+<li>Significance Level <strong><a href="https://www.statisticsteacher.org/2017/09/15/what-is-power/"><span class="math inline">\(\alpha\)</span></a></strong><br />
+</li>
+<li>Power <strong><a href="https://www.statisticsteacher.org/2017/09/15/what-is-power/">(1 - <span class="math inline">\(\beta\)</span>)</a></strong><br />
+</li>
+<li>Mean difference of the two distributions <strong><a href="https://machinelearningmastery.com/effect-size-measures-in-python/"><span class="math inline">\(\mu\)</span><sub>d</sub></a></strong></li>
+<li>Pooled standard deviation of the two distributions <strong><a href="https://machinelearningmastery.com/effect-size-measures-in-python/"><span class="math inline">\(\sigma\)</span><sub>d</sub></a></strong><br />
+</li>
+<li>Effect Size <strong><a href="https://machinelearningmastery.com/effect-size-measures-in-python/"><span class="math inline">\(\mu\)</span><sub>d</sub> / <span class="math inline">\(\sigma\)</span><sub>d</sub></a></strong></li>
+</ul>
+<p>In this type of problem, the significance level and power variables should be pre-determined and two common values are traditionally set at 0.05 and 0.80, respectively.</p>
+<p>The effect size is calculated by estimating or assuming the mean difference and pooled standard deviation of the two groups. Estimating the <strong>effect size</strong> is often the <strong>most challenging</strong> part of the analysis because the data and, thus, the distribution of that data may not exist.</p>
+<p><strong><a href="http://www.biostat.jhsph.edu/~rpeng/">Roger D. Peng</a></strong> and <strong><a href="https://hilaryparker.com/about-hilary-parker/">Hilary Parker</a></strong> talk about this problem at great length in their book called <em><a href="https://leanpub.com/conversationsondatascience">Conversations on Data Science</a></em>.</p>
+<p>In the book, they agree that in biostats, sample sizes are often pre-determined based on the budget. They also point to the fact that a lot of time is typically spent estimating an appropriate effect size. Therefore, in practice, most biostatisticians actually back into the power calculation once they have determined the appropriate effect size and know what the sample size will be.</p>
+<p><br></p>
+</div>
+<div id="solution-statement" class="section level2">
+<h2>Solution Statement</h2>
+<p>This article does not go into great detail about how deal with challenges of estimating effect sizes. It does, however, offer three data sets and shows how various effect sizes can dramatically influence the sample sizes required to uphold the significance and the power levels.</p>
+<p>The article will also walk you through how to calculate the appropriate sample size step-by-step in R.</p>
+<p>Lastly, this article lists some incredible references that go into more detail about the math as well as some of the pitfalls biostatisticians run into when calculating power, effect size, and sample size.
+<br></p>
+</div>
+<div id="load-libraries" class="section level2">
+<h2>Load Libraries</h2>
+<p>To get started, let’s load the libraries listed below.</p>
+<pre class="r"><code>library(tidyverse)
+library(tidyquant)
+library(grid)</code></pre>
+<p><br></p>
+</div>
+<div id="sample-size-calculation-components" class="section level2">
+<h2>Sample Size Calculation Components</h2>
+<p>Next, we need to assume or calculate the following metrics on each of our two groups (Group A and Group B. The items and the definitions are listed below.</p>
+<ul>
+<li><p><span class="math inline">\(\alpha\)</span> = significance level (traditionally set at 0.05)<br />
+</p></li>
+<li><p>(1 - <span class="math inline">\(\beta\)</span>) = power (traditionally set at = 0.80)</p></li>
+<li><p><span class="math inline">\(\mu\)</span><sub>a</sub> = population mean Group A<br />
+</p></li>
+<li><p><span class="math inline">\(\mu\)</span><sub>b</sub> = population mean Group B<br />
+</p></li>
+<li><p><span class="math inline">\(\mu\)</span><sub>d</sub> = population mean difference <span class="math inline">\(\mu\)</span><sub>a</sub> - <span class="math inline">\(\mu\)</span><sub>b</sub></p></li>
+<li><p><span class="math inline">\(\sigma\)</span><sub>a</sub> = standard deviation Group A<br />
+</p></li>
+<li><p><span class="math inline">\(\sigma\)</span><sub>b</sub> = standard deviation Group B<br />
+</p></li>
+<li><p><span class="math inline">\(\sigma\)</span><sub>d</sub> = population standard deviation of the paired difference</p></li>
+<li><p><span class="math inline">\(\mu\)</span><sub>d</sub> / <span class="math inline">\(\sigma\)</span><sub>d</sub> = effect size</p></li>
+</ul>
+<p><br></p>
+</div>
+<div id="significance-level-and-power-inputs" class="section level2">
+<h2>Significance Level and Power Inputs</h2>
+<p>As stated above, these inputs can be determined prior to the study and the values listed below are traditionally used in practice. However, please note any one of these values can also be calculated if all other items are known. For this article, we will assume a significance level of 0.05 and a power of 0.80 for all three examples.</p>
+<pre class="r"><code>sign_level    &lt;- 0.05
+pwr           &lt;- 0.80</code></pre>
+</div>
+<div id="data-distributions-of-the-two-groups" class="section level2">
+<h2>Data Distributions of the Two Groups</h2>
+<p>The other items that affect each group’s appropriate sample sizes is the distribution of the data. In other words, we need to know the means and the standard deviations of the two groups before we can determine the appropriate sample size.</p>
+<p>As noted before, this is typically the hardest part of the calculation, because often the distributions of the two sets are unknown. However, there are ways to estimate the distributions of the two groups. Some common methods include:</p>
+<ul>
+<li>Use estimates from previous studies or research previously. This may not be available.<br />
+</li>
+<li>Run a pilot study. This may be expensive.<br />
+</li>
+<li>Ask subject matter experts to estimate the distribution based on best-guess. This will have the most uncertainty.</li>
+</ul>
+<p>Source: <a href="https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf" class="uri">https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf</a></p>
+</div>
+<div id="create-multiple-sample-data-sets" class="section level2">
+<h2>Create Multiple Sample Data Sets</h2>
+<p>In this article, we do not have access to actual data, so we will use dummy data instead. We can create three (3) sample data sets that are normally distributed that assume the same significance level, power, and standard deviations. However, the data sets will include various mean differences.</p>
+<pre class="r"><code>set.seed(1234)
+
+data_set_01 &lt;- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 1.10, sd = 1.20))
+
+data_set_02 &lt;- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 2.50, sd = 1.20)) 
+
+data_set_03 &lt;- tibble(
+  group_A = rnorm(100, mean = 1.00, sd = 1.20),
+  group_B = rnorm(100, mean = 4.50, sd = 1.20))
+
+data_set_01 &lt;- data_set_01 %&gt;%
+  mutate(data_group = &quot;data_set_01&quot;)
+
+data_set_02 &lt;- data_set_02 %&gt;% 
+  mutate(data_group = &quot;data_set_02&quot;)
+
+data_set_03 &lt;- data_set_03 %&gt;% 
+  mutate(data_group = &quot;data_set_03&quot;)</code></pre>
+<p><br></p>
+</div>
+<div id="union-data-sets" class="section level2">
+<h2>Union Data Sets</h2>
+<p>Let’s stack the data sets on top of one another so that we can appropriately add more calculated fields to the data set.</p>
+<pre class="r"><code>mult_data_set &lt;- rbind(data_set_01, data_set_02, data_set_03) %&gt;%
+  select(data_group, everything())</code></pre>
+<p>Let’s take a look at the sample data set.</p>
+<pre class="r"><code>head(mult_data_set)
+## # A tibble: 6 x 3
+##   data_group  group_A group_B
+##   &lt;chr&gt;         &lt;dbl&gt;   &lt;dbl&gt;
+## 1 data_set_01  -0.448   1.60 
+## 2 data_set_01   1.33    0.530
+## 3 data_set_01   2.30    1.18 
+## 4 data_set_01  -1.81    0.497
+## 5 data_set_01   1.51    0.109
+## 6 data_set_01   1.61    1.30</code></pre>
+<p><br></p>
+</div>
+<div id="additional-calculations-in-r" class="section level2">
+<h2>Additional Calculations in R</h2>
+<p>Before we can calculate the sample size for each group, we need to calculate the mean difference and the pooled standard deviation. We will also calculate the effect size.</p>
+<pre class="r"><code>mult_data_set_calcs &lt;- mult_data_set %&gt;%
+  group_by(data_group) %&gt;%
+  mutate(mean_A = mean(group_A),
+         mean_B = mean(group_B),
+         mean_diff = abs(mean_A - mean_B),
+         sd_A   = sd(group_A),
+         sd_B   = sd(group_B),
+         pooled_sd = sqrt((sd_A^2 + sd_B^2)/2),
+         eff_size = mean_diff / pooled_sd
+         ) %&gt;%
+  add_tally() %&gt;%
+  ungroup() %&gt;%
+  select(data_group, everything())</code></pre>
+<p>Let’s take a look at what the data set looks like now.</p>
+<pre class="r"><code>mult_data_set_calcs %&gt;% glimpse()
+## Rows: 300
+## Columns: 11
+## $ data_group &lt;chr&gt; &quot;data_set_01&quot;, &quot;data_set_01&quot;, &quot;data_set_01&quot;, &quot;data_set_0...
+## $ group_A    &lt;dbl&gt; -0.448478899, 1.332915091, 2.301329412, -1.814837243, 1....
+## $ group_B    &lt;dbl&gt; 1.59742824, 0.53033783, 1.17919219, 0.49702666, 0.108801...
+## $ mean_A     &lt;dbl&gt; 0.8118859, 0.8118859, 0.8118859, 0.8118859, 0.8118859, 0...
+## $ mean_B     &lt;dbl&gt; 1.149492, 1.149492, 1.149492, 1.149492, 1.149492, 1.1494...
+## $ mean_diff  &lt;dbl&gt; 0.3376059, 0.3376059, 0.3376059, 0.3376059, 0.3376059, 0...
+## $ sd_A       &lt;dbl&gt; 1.205286, 1.205286, 1.205286, 1.205286, 1.205286, 1.2052...
+## $ sd_B       &lt;dbl&gt; 1.238625, 1.238625, 1.238625, 1.238625, 1.238625, 1.2386...
+## $ pooled_sd  &lt;dbl&gt; 1.222069, 1.222069, 1.222069, 1.222069, 1.222069, 1.2220...
+## $ eff_size   &lt;dbl&gt; 0.2762576, 0.2762576, 0.2762576, 0.2762576, 0.2762576, 0...
+## $ n          &lt;int&gt; 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1...</code></pre>
+<p><br></p>
+</div>
+<div id="mean-difference-pooled-standard-deviation" class="section level2">
+<h2>Mean Difference &amp; Pooled Standard Deviation</h2>
+<p>The mean difference and the pooled standard deviation values are extracted from the tibbles. These individual values will be plugged into the <strong><a href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/power.t.test">power.t.test()</a></strong> function in the next step. We will also extract the effect size so that it can be included in the graphs later on.</p>
+<pre class="r"><code>data_set_01 &lt;- mult_data_set_calcs %&gt;% 
+  filter(data_group == &quot;data_set_01&quot;)
+
+data_set_02 &lt;- mult_data_set_calcs %&gt;% 
+  filter(data_group == &quot;data_set_02&quot;)
+
+data_set_03 &lt;- mult_data_set_calcs %&gt;% 
+  filter(data_group == &quot;data_set_03&quot;)
+
+mean_diff_01 &lt;- data_set_01$mean_diff[[1]]
+pooled_sd_01 &lt;- data_set_01$pooled_sd[[1]]
+eff_size_01  &lt;- data_set_01$eff_size[[1]]
+
+mean_diff_02 &lt;- data_set_02$mean_diff[[1]]
+pooled_sd_02 &lt;- data_set_02$pooled_sd[[1]]
+eff_size_02  &lt;- data_set_02$eff_size[[1]]
+
+mean_diff_03 &lt;- data_set_03$mean_diff[[1]]
+pooled_sd_03 &lt;- data_set_03$pooled_sd[[1]]
+eff_size_03  &lt;- data_set_03$eff_size[[1]]</code></pre>
+<p><br></p>
+</div>
+<div id="calculate-the-appropriate-sample-size" class="section level2">
+<h2>Calculate the Appropriate Sample Size</h2>
+<p>Now that we have all the individual pieces for each data set, we can estimate the sample size for the 3 various distributions using the power.t.test() function.</p>
+<pre class="r"><code>power_test_01  &lt;- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_01,
+                               delta     = mean_diff_01,
+                               power     = pwr)
+
+power_test_02  &lt;- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_02,
+                               delta     = mean_diff_02,
+                               power     = pwr)
+
+power_test_03  &lt;- power.t.test(sig.level = sign_level,
+                               sd        = pooled_sd_03,
+                               delta     = mean_diff_03,
+                               power     = pwr)</code></pre>
+<p>In order to properly preserve the power and significance levels, we round the sample size up.</p>
+<pre class="r"><code>number_each_group_01 &lt;- ceiling(power_test_01$n)
+number_each_group_02 &lt;- ceiling(power_test_02$n)
+number_each_group_03 &lt;- ceiling(power_test_03$n)</code></pre>
+<p>Additionally, we need to convert those values into a tibble format, so that they can be labeled in the distribution charts later on.</p>
+<pre class="r"><code>n_01 &lt;- tibble(data_group = c(&quot;data_set_01&quot;),
+               n_per_group = number_each_group_01)
+
+n_02 &lt;- tibble(data_group = c(&quot;data_set_02&quot;),
+               n_per_group = number_each_group_02)
+
+n_03 &lt;- tibble(data_group = c(&quot;data_set_03&quot;),
+               n_per_group = number_each_group_03)
+
+n_all_sets &lt;- rbind(n_01, n_02, n_03)</code></pre>
+<p><br></p>
+</div>
+<div id="tidy-up-the-data" class="section level2">
+<h2>Tidy Up the Data</h2>
+<p>Before we graph the distributions, let’s make the data tidy.</p>
+<pre class="r"><code>metrics_by_data_set &lt;- mult_data_set_calcs %&gt;%
+  select(data_group, mean_diff, pooled_sd, eff_size, n) %&gt;%
+  distinct()
+
+mult_data_set_tidy_tbl &lt;- mult_data_set %&gt;%
+  pivot_longer(
+    cols = -data_group,
+    names_to = &quot;group&quot;,
+    values_to = &quot;value&quot;
+  ) %&gt;%
+  left_join(metrics_by_data_set) %&gt;%
+  left_join(n_all_sets)
+## Joining, by = &quot;data_group&quot;
+## Joining, by = &quot;data_group&quot;</code></pre>
+<p>A sample of the tidy tibble is listed below.</p>
+<pre class="r"><code>mult_data_set_tidy_tbl %&gt;% glimpse()
+## Rows: 600
+## Columns: 8
+## $ data_group  &lt;chr&gt; &quot;data_set_01&quot;, &quot;data_set_01&quot;, &quot;data_set_01&quot;, &quot;data_set_...
+## $ group       &lt;chr&gt; &quot;group_A&quot;, &quot;group_B&quot;, &quot;group_A&quot;, &quot;group_B&quot;, &quot;group_A&quot;, ...
+## $ value       &lt;dbl&gt; -0.44847890, 1.59742824, 1.33291509, 0.53033783, 2.3013...
+## $ mean_diff   &lt;dbl&gt; 0.3376059, 0.3376059, 0.3376059, 0.3376059, 0.3376059, ...
+## $ pooled_sd   &lt;dbl&gt; 1.222069, 1.222069, 1.222069, 1.222069, 1.222069, 1.222...
+## $ eff_size    &lt;dbl&gt; 0.2762576, 0.2762576, 0.2762576, 0.2762576, 0.2762576, ...
+## $ n           &lt;int&gt; 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, ...
+## $ n_per_group &lt;dbl&gt; 207, 207, 207, 207, 207, 207, 207, 207, 207, 207, 207, ...</code></pre>
+</div>
+<div id="graphically-compare-the-inputs-and-results" class="section level2">
+<h2>Graphically Compare the Inputs and Results</h2>
+<p>Now that the data is tidy, we can graphically compare and contrast the results of three different data sets.</p>
+<pre class="r"><code>ggplot(mult_data_set_tidy_tbl, aes(x = value, fill = group)) +
+  geom_density(alpha = .95) +
+  scale_color_grey() +
+  scale_fill_grey(start = 0.5, end = 0.80) +
+  theme_classic() +
+  theme(legend.position=&quot;bottom&quot;) +
+  guides(fill=guide_legend(&quot;&quot;)) +
+  labs(title = &quot;Distribution Comparison&quot;,
+       subtitle = &quot;p-value = 0.05, Power = 0.80&quot;) +
+  
+  facet_wrap(~ data_group) +
+  
+  geom_text(
+    data = mult_data_set_tidy_tbl,
+    mapping = aes(x = -2.00, 
+                  y = 0.07,
+                  hjust = 0,
+                  label = str_c(&quot;Mean Diff = &quot;, format(mean_diff, digits = 2), &quot;\n&quot;, 
+                                &quot;Pooled StDev = &quot;, format(pooled_sd, digits = 2), &quot;\n&quot;,
+                                &quot;Effect Size = &quot;, format(eff_size, digits = 2), &quot;\n&quot;,
+                                &quot;N Size = &quot;, format(n_per_group, digits = 0))))</code></pre>
+<p><img src="/post/2020-06-21-Power-Calcs_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="final-conclusions-analysis-and-thoughts" class="section level2">
+<h2>Final Conclusions, Analysis, and Thoughts</h2>
+<p>As witnessed in the graph above, the effect size can dramatically impact the sample size required to uphold the power and significance levels in a study. Moving from left to right, one can see that as there becomes less and less overlap in the two groups, and the n size starts to decrease. In other words, if a smaller effect size is requested, the number of observations required will increase. Larger sample sizes are pretty cheap in tech companies testing website traffic patterns, so it may not be an issue. However, requiring larger sample size in a field like biostatistics can be a problem since experimental type data is often very costly.</p>
+<p>As mentioned earlier, calculating the sample size can be a much more complicated analysis if some of the data is unknown. Estimating the mean differences, and standard deviations of the two groups is often a collective effort that involves statisticians as well as subject matter experts.</p>
+<p>If you are interested in learning more about power calculations and all its parts, please check out the awesome references below.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ul>
+<li>Title: Power Analysis, Clearly Explained<br />
+</li>
+<li>Author: Josh Starmer<br />
+</li>
+<li>Link: <a href="https://www.youtube.com/watch?v=VX_M3tIyiYk&amp;feature=youtu.be" class="uri">https://www.youtube.com/watch?v=VX_M3tIyiYk&amp;feature=youtu.be</a></li>
+</ul>
+<hr>
+<ul>
+<li>Title: Statistical Power, Clearly Explained<br />
+</li>
+<li>Author: Josh Starmer<br />
+</li>
+<li>Link: <a href="https://www.youtube.com/watch?v=Rsc5znwR5FA&amp;feature=youtu.be" class="uri">https://www.youtube.com/watch?v=Rsc5znwR5FA&amp;feature=youtu.be</a></li>
+</ul>
+<hr>
+<ul>
+<li>Title: BMI 541/699 Lecture 13<br />
+</li>
+<li>Link: <a href="https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf" class="uri">https://www.biostat.wisc.edu/~lindstro/13.sample.size.10.20.pdf</a></li>
+</ul>
+<hr>
+<ul>
+<li>Title: Conversations on Data Science<br />
+</li>
+<li>Author: Roger D. Peng &amp; Hilary Parker</li>
+<li>Link: <a href="https://leanpub.com/conversationsondatascience" class="uri">https://leanpub.com/conversationsondatascience</a></li>
+</ul>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
