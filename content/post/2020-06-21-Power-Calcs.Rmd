@@ -70,7 +70,7 @@ Next, we need to assume or calculate the following metrics on each of our two gr
 <br>
 
 ## Significance Level and Power Inputs
-As stated above, these inputs can be determined prior to the study and the values listed below are traditionally used in practice.  However, please note any one of these values can also be calculated if all other items are known.  For this article, we will assume a significance level of 0.05 and a power of 0.80 for all three examples.
+As stated above, these inputs can be determined prior to the study and the values listed below are traditionally used in practice.  However, please note any one of these values can also be calculated if all other items are known.  For this article, we will assume a significance level of 0.05 and a power of 0.80 for all three dummy data sets.
 ```{r}
 sign_level    <- 0.05
 pwr           <- 0.80
@@ -287,7 +287,7 @@ ggplot(mult_data_set_tidy_tbl, aes(x = value, fill = group)) +
 <br>
 
 ## Final Conclusions, Analysis, and Thoughts
-As witnessed in the graph above, the effect size can dramatically impact the sample size required to uphold the power and significance levels in a study.  Moving from left to right, one can see that as there becomes less and less overlap in the two groups, and the n size starts to decrease.  In other words, if a smaller effect size is requested, the number of observations required will increase.  Larger sample sizes are pretty cheap in tech companies testing website traffic patterns, so it may not be an issue.  However, requiring larger sample size in a field like biostatistics can be a problem since experimental type data is often very costly.
+As witnessed in the graph above, the effect size can dramatically impact the sample size required to uphold the power and significance levels in a study.  Moving from left to right in the graphs above, one can see that as there becomes less and less overlap in the two groups, the n size starts to decrease.  In other words, smaller effect sizes require a larger number of observations.  Larger sample sizes are pretty cheap in tech companies testing website traffic patterns, so it may not be an issue.  However, requiring larger sample size in a field like biostatistics can be a problem since experimental type data is often very costly.
 
 As mentioned earlier, calculating the sample size can be a much more complicated analysis if some of the data is unknown.  Estimating the mean differences, and standard deviations of the two groups is often a collective effort that involves statisticians as well as subject matter experts.
 
