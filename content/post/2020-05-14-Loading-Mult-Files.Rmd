@@ -1,5 +1,5 @@
 ---
-title: "Loading Multiple Files from Various Folders Using R"
+title: "Loading Multiple Files from Various Folders"
 author: "Ed Orlando"
 date: 2020-05-14
 categories: ["R"]

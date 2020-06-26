@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>Examining Power Calculations Using R</title>
-      <link>/2020/06/21/examining-power-calculations-using-r/</link>
+      <title>Examining Power Calculations</title>
+      <link>/2020/06/21/examining-power-calculations/</link>
       <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/06/21/examining-power-calculations-using-r/</guid>
+      <guid>/2020/06/21/examining-power-calculations/</guid>
       <description>Author: Ed Orlando
 Introduction &amp;amp; Problem StatementCalculating sample sizes while accounting for power is fairly straight-forward if you have all the required inputs. Many universities have online calculators that help you determine the appropriate sample size. The variables needed to calculate the sample size while accounting for power are listed below. This article will utilize Cohen’s d calculations in the examples presented. If you are unfamiliar with any of the terms below, please click on any of the symbols for more information.</description>
     </item>

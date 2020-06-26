@@ -1,0 +1,361 @@
+---
+title: "Exploring Expected Values"
+author: "Ed Orlando"
+date: 2020-06-24
+categories: ["R"]
+tags: ["R Markdown", "Expected Values", "R Studio"]
+description: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Author: Ed Orlando
+
+## Introduction
+Expected values can be a little tricky to understand the first time around.  Using some simple and more advanced examples, this article will help you understand the mystery behind Expected Values. We will specifically answer the following questions with the help of R:  
+
+* **Q1:** *How much do I gain - or lose - on average, if I repeatedly play a given gambling game?*  
+* **Q2:** *How much can I expect to gain - or lose - by making a certain bet?*  
+* **Q3:** *What is the likelihood of owing your friend money after 3 bets given 4:1 favorable odds?*
+* **Q4:** *What is the minimum number of bets needed to have a ~98% chance of a net win given 4:1 odds?*
+
+Questions 1 and 2 source: **[StatLect](<https://www.statlect.com/fundamentals-of-probability/expected-value>)**
+
+<br>
+
+## Gratitude & Motivation
+Inspiration and and the early examples used for this post come directly from **[Josh Starmer's StatQuest](<https://statquest.org/about/>)** video on **[Expected Values](<https://www.youtube.com/watch?v=fU2PuYKsr6M&feature=youtu.be>)**.  I really enjoy Josh's delivery and highly recommend his videos.
+
+<br> 
+
+## Expected Value Defined
+
+Expected Values and Probability are two very important foundations of statistics.
+
+According to the **[StatLect](<https://www.statlect.com/fundamentals-of-probability/expected-value>)** website, 
+Expected Values were *"first devised in the 17th century to analyze gambling games and answer questions such as*:  
+
+* *How much do I gain - or lose - on average, if I repeatedly play a given gambling game?*  
+* *How much can I expect to gain - or lose - by making a certain bet?*  
+
+*If the possible outcomes of the game (or the bet) and their associated probabilities are described by a random variable, then these questions can be answered by computing its expected value.*
+
+*The expected value is a weighted average of the possible realizations of the random variable (the possible outcomes of the game). Each realization is weighted by its probability"* - Marco Taboga, PhD.
+
+<br>
+
+## Load Libraries
+Before we get started, let's load some libraries.
+```{r echo=TRUE, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+<br>
+
+## Setting Up the Data Set and Probabilities
+
+Let's assume that we randomly asked **200 individuals** if they prefer vanilla or strawberry ice cream.  After the survey, there were **40 vanilla** fans and **160 strawberry** fans.     
+
+```{r, echo = FALSE, results = 'asis'}
+data_set <- tibble(
+  ice_cream_type = c("Vanilla", "Strawberry"),
+  n_size         = c(40, 160))
+```
+
+After tallying the results, we can calculate the probability of a person preferring either vanilla or strawberry ice cream as shown below.
+
+```{r}
+data_set <- data_set %>%
+  mutate(total_n_size = sum(n_size),
+         probability  = round(n_size/total_n_size,4))
+```
+
+```{r}
+data_set
+```
+
+The calculation above shows that **20%** of the people surveyed prefer vanilla and **80%** prefer strawberry.  
+
+For this example, let's assume the survey results represent the population.  Therefore, we can **expect very similar outcomes** if we surveyed another random group of 200 individuals.
+
+<br>
+
+## Betting with Emotions Over Facts
+
+Now let's assume that your friend is a huge vanilla ice cream fan and does not want to believe the survey results.  He is convinced that even though the stats say something different, he believes more people prefer vanilla over strawberry.  
+
+In fact, your friend is so confident that he wants to wager a bet on it.  He tells you that for the **next 100 people** surveyed, he will **give you \$1 for every strawberry fan** and you will have to **pay him \$1 for every vanilla fan**.
+
+Remember, **80%** of people prefer strawberry and only **20%** prefer vanilla.  The odds are heavily in your favor and this sounds like a good bet.  However, you are hate to lose money, even if it's only \$1.  Therefore, let's first answer the following questions before you make the bet.
+
+<br>
+
+## Q1: How much do I gain - or lose - on average, if I repeatedly play a given gambling game? 
+To recall, remember that about **80%** of people are strawberry fans and about **20%** are vanilla fans.  These odds are in your favor.   
+
+Since your friend is a huge fan of vanilla ice cream and is betting with emotion versus facts, we would assume that this is a good bet.  In fact, **on average**, we can assume that you would make about **\$0.60 per bet** or approximately **\$60** if we bet 100 times in a row.  See breakdown of the math below.  
+
+* Estimated Dollars Lost = \$1 x 20% x 100 bets = \$20 lost
+* Estimated Dollars Won  = \$1 x 80% x 100 bets = \$80 won
+* Final Tally = \$80 - \$20 = **\$60**  
+* Estimated amount earned per bet = \$60 / 100 bets = **\$0.60 per bet**  
+
+We can code those results into our tibble below.
+
+```{r}
+outcome <- tibble(outcome = c(-1, 1))
+
+data_set <- cbind(data_set, outcome) %>%
+  mutate(expected_prob = probability * outcome,
+         num_new_bets  = 100,
+         expected_value = expected_prob * num_new_bets) 
+
+glimpse(data_set)
+```
+
+<br>
+
+## Q2: How much can I expect to gain - or lose - by making a certain bet?  
+
+Technically we answered this question if 100 bets were made.  We can expect to win about **\$0.60 every time we bet**.  Remember, this assumes multiple bets, and although we are betting \$1 for each bet, the \$0.60 represents winnings after **averaging multiple bets**.  
+
+```{r}
+certain_bet_amount <- data_set %>%
+  summarise(certain_bet = sum(expected_value) / max(num_new_bets))
+
+certain_bet_amount
+```
+
+<br>
+
+## Q3: What is the likelihood of owing your friend money after 3 bets given 4:1 favorable odds?
+
+However, instead of asking the next 100 random people their opinion, what if your friend only wants to ask the next **3 random people** if they prefer vanilla or strawberry?  
+
+Given the probabilities above, the odds of you owing your friend money is ~**10.2%** if you bet only **3 times**.  
+
+Let's prove it out with a 1,000 experiments.  
+
+In order to prove it out, we will uniformly assign 3 random values between 0 and 1 for each of the 1,000 experiments.  If one of the random numbers is less than **0.20**, then you **lose \$1**, otherwise you **gain \$1**.  Remember, the 0.20 represents the probability that someone prefers vanilla ice cream.
+
+We will tally up the totals for each experiment, and count how many times you were in the red versus in the black.
+
+```{r}
+set.seed(1324)
+
+three_bet_experiment <- tibble(
+  experiment_num = rep(c(1:1000), each = 3),
+  random_value   = runif(3000, 0, 1))
+  
+three_bet_experiment <- three_bet_experiment %>%
+  mutate(win_loss = case_when(random_value <= 0.20 ~ -1,
+                              TRUE ~ 1))
+```
+
+Let's take a look at how the data set looks before we summarize the results.  Keep in mind that each experiment has a total of 4 possible outcomes since the order does not matter:  
+
+* WWW = Win a total of $3
+* WWL | WLW | LWW = Win a total of $1
+* LLW | LWL | WLL = Lose a total of $1
+* LLL = Lose a total of $3
+
+*W = You Win, L = You Lose*
+
+```{r}
+head(three_bet_experiment)
+```
+
+* Experiment #1 Results: LWW = $1 net win  
+* Experiment #2 Results: WLW = $1 net win
+
+Now we can repeat these experiments 1,000 times and tally up the results.
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+three_bet_aggr <- three_bet_experiment %>%
+  group_by(experiment_num) %>%
+  summarise(win_loss_sum = sum(win_loss)) %>%
+  ungroup() %>%
+  mutate(win_loss_bucket = case_when(win_loss_sum < 0 ~ str_c("Loss of $", abs(win_loss_sum)),
+                                     TRUE ~ str_c("Winnings of $", win_loss_sum))) %>%
+  mutate(win_loss_tally = 1)
+```
+
+```{r}
+head(three_bet_aggr)
+```
+
+To set up the bar chart, let's aggregate the results.
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+three_bet_graph <- three_bet_aggr %>%
+  select(win_loss_bucket, win_loss_tally) %>%
+  group_by(win_loss_bucket) %>%
+  summarise(win_loss_tally = sum(win_loss_tally)) %>%
+  ungroup() %>%
+  mutate(win_loss_perc = win_loss_tally / 1000)
+```
+
+```{r}
+head(three_bet_graph)
+```
+
+Next, we can visualize how each of those betting scenarios played out over 1,000 experiments.  Remember, there are only 4 possible net outcomes for each experiment.  You can either **Win \$3**, **Win \$1**, **Lose \$1**, or, in some very rare cases, actually **Lose \$3**.  
+
+```{r}
+g <- ggplot(three_bet_graph, 
+            aes(x = reorder(win_loss_bucket, win_loss_perc), 
+                y = win_loss_perc)) + 
+  geom_bar(stat = "identity",
+           fill = "#a0acb8") +
+  geom_text(aes(x = win_loss_bucket,
+                y = win_loss_perc + 0.02, 
+                label = scales::percent(win_loss_perc))) +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text.x = element_blank()) +
+  xlab(label = "") +
+  ylab(label = "") +
+  labs(title = "Betting Outcome Summary",
+       subtitle = "3 Bets for 1,000 Experiments")
+  
+g
+```
+
+Since each experiment only includes 3 bets, the odds of you paying out money to your friend is ~**10.2%** despite having the odds heavily in your favor.  There is even a ~**0.9%** chance that you might owe your friend $3 after 3 bets.    
+
+Conversely, you came out ahead about ~**89.8%** of the time.  You won \$3 **50.3%** of the time and won \$1 **39.5%** of the time.
+
+<br>
+
+## Q4: What is the minimum number of bets needed to have a ~98% chance of a net win given 4:1 odds?
+
+Instead of having a **~89.8%** chance of a net win, how many bets in a row would it take to increase your probability of a net win to **~98%**?
+
+Based on the odds presented earlier, the number of consecutive bets you would need to have ~**98%** chance of coming out ahead is **~9 bets**.
+
+Let's set up various betting scenarios and visualize the probabilities that will help us prove this out.  We will simulate 1 bet, 3 bet, 5 bet, 7 bet and 9 bet scenarios using 1,000 experiments for each scenario and count how many times you owe you friend in each experiment.  We will then tally and graph the results.
+
+```{r}
+set.seed(123)
+
+bet_scenario_tbl <- rbind(
+  str_c(rep(c(1:1), each = 1000), " Bet") %>% enframe(),
+  str_c(rep(c(3:3), each = 3000), " Bet") %>% enframe(),
+  str_c(rep(c(5:5), each = 5000), " Bet") %>% enframe(),
+  str_c(rep(c(7:7), each = 7000), " Bet") %>% enframe(),
+  str_c(rep(c(9:9), each = 9000), " Bet") %>% enframe()
+  ) %>%
+  rename(bet_scenario = value)
+
+
+experiment_num_tbl <- rbind(
+  rep(c(1:1000), each = 1) %>% enframe(),
+  rep(c(1:1000), each = 3) %>% enframe(),
+  rep(c(1:1000), each = 5) %>% enframe(),
+  rep(c(1:1000), each = 7) %>% enframe(),
+  rep(c(1:1000), each = 9) %>% enframe()
+  ) %>%
+  rename(experiment_num = value)
+
+
+random_value_tbl <- runif(25000, 0, 1) %>% enframe() %>%
+  rename(random_value = value)
+
+mult_bet_scenario_tbl <- cbind(bet_scenario_tbl, experiment_num_tbl, random_value_tbl) %>%
+  select(bet_scenario, experiment_num, random_value)
+```
+
+```{r}
+head(mult_bet_scenario_tbl)
+```
+
+
+Now that the data is set up, let's add the same calculated fields as we did earlier.
+
+```{r}
+mult_bet_scenario_tbl <- mult_bet_scenario_tbl %>%
+  mutate(win_loss = case_when(random_value <= 0.20 ~ -1,
+                              TRUE ~ 1))
+```
+
+Now we can tally up the results of each of the 1,000 experiments for each of the betting scenarios.
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+mult_bet_scenario_aggr <- mult_bet_scenario_tbl %>%
+  group_by(bet_scenario, experiment_num) %>%
+  summarise(win_loss_sum = sum(win_loss)) %>%
+  ungroup() %>%
+  mutate(win_loss_bucket = case_when(win_loss_sum < 0 ~ "Number of Times You Owe",
+                                     TRUE ~ "Number of Times You Collect")) %>%
+  mutate(win_loss_tally = 1)
+```
+
+```{r}
+mult_bet_scenario_aggr %>% glimpse()
+```
+
+
+To set up the bar charts, let's aggregate the results.
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+mult_bet_scenario_graph <- mult_bet_scenario_aggr %>%
+  select(bet_scenario, win_loss_bucket, win_loss_tally) %>%
+  group_by(bet_scenario, win_loss_bucket) %>%
+  summarise(win_loss_tally = sum(win_loss_tally)) %>%
+  ungroup() %>%
+  mutate(win_loss_perc = win_loss_tally / 1000)
+```
+
+```{r}
+head(mult_bet_scenario_graph)
+```
+
+
+Next, we can visualize multiple betting scenarios played out over 1,000 experiments each.  In other words, how do your chances of not having to pay increase with the number of consecutive bets made.    
+
+```{r}
+g <- ggplot(mult_bet_scenario_graph, 
+            aes(x = reorder(win_loss_bucket, win_loss_perc), 
+                y = win_loss_perc)) + 
+  geom_bar(stat = "identity",
+           fill = "#a0acb8") +
+  geom_text(aes(x = win_loss_bucket, 
+                y = win_loss_perc + 0.2, 
+                label = scales::percent(win_loss_perc))) +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text.x = element_blank()) +
+  xlab(label = "") +
+  ylab(label = "") +
+  labs(title = "Betting Outcome Summary",
+       subtitle = "Based on 1,000 Simulations for Each Scenario") +
+  
+  ylim(-0.2, 1.4) +
+  
+  facet_wrap( ~ bet_scenario, ncol = 3)
+  
+g
+```
+
+Using the probabilities we've assumed all throughout this article, if you decided to bet your friend that the next person is indeed a strawberry fan, there is ~19.8% chance that you would lose that bet.  It is not surprising that this value is almost identical to the original ~20.0% probability of someone perferring vanilla.
+
+However, as you increase the number of bets, the chances of you losing drop fairly quickly.  To summarize:  
+
+* The odds of you owing money is **~19.8%** when **1** bet is made.  
+* The odds of you owing money is **~11.2%** when **3** bets are made.  
+* The odds of you owing money is **~6.9%** when **5** bets are made.  
+* The odds of you owing money is **~4.0%** when **7** bets are made.  
+* The odds of you owing money is **~1.4%** when **9** bets are made.
+
+Note that the numbers above can vary slightly depending on how many experiments are ran but are nonetheless good estimates of how the odds change as the number of bets increases.
+
+## Conclusion & Next Steps
+
+To summarize, when calculating Expected Values, it is important to understand the probability and value assigned to each outcome and how many times you get to repeat an event.  
+
+When you increase the number of bets or events, you can increase your chances of a net win if the odds are in your favor.  That is why the casinos are so successful even when they only have a slight advantage.  The casinos have very slight overall advantages over the players.  However, casinos are able to bet thousands of times which dramatically increases their chances of having an overall net gain.  In other words, the phrase, house always wins is a very true statement.
+
+<br>
+For questions related to this analysis, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.  
+
+For access to more of my articles, please check out my **[blog](<https://ed-orlando-07-blog-site.netlify.app/>)**.

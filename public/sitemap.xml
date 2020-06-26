@@ -4,21 +4,51 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2020/06/21/examining-power-calculations-using-r/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
+    <loc>/tags/expected-values/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/06/24/exploring-expected-values/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/r/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r-markdown/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r-studio/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/06/21/examining-power-calculations/</loc>
     <lastmod>2020-06-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -29,26 +59,6 @@
   
   <url>
     <loc>/tags/power.t.test/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/r/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r-markdown/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r-studio/</loc>
-    <lastmod>2020-06-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
     <lastmod>2020-06-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -78,7 +88,7 @@
   </url>
   
   <url>
-    <loc>/2020/06/15/website-anomaly-detection-using-r-tableau/</loc>
+    <loc>/2020/06/15/website-time-series-anomaly-detection/</loc>
     <lastmod>2020-06-15T00:00:00+00:00</lastmod>
   </url>
   
@@ -123,7 +133,7 @@
   </url>
   
   <url>
-    <loc>/2020/06/03/predicting-employee-attrition-using-r/</loc>
+    <loc>/2020/06/03/predicting-employee-attrition/</loc>
     <lastmod>2020-06-03T00:00:00+00:00</lastmod>
   </url>
   
@@ -158,7 +168,7 @@
   </url>
   
   <url>
-    <loc>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</loc>
+    <loc>/2020/05/18/build-a-spotify-playlist-recommendation-model/</loc>
     <lastmod>2020-05-18T00:00:00+00:00</lastmod>
   </url>
   
@@ -178,7 +188,7 @@
   </url>
   
   <url>
-    <loc>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</loc>
+    <loc>/2020/05/14/loading-multiple-files-from-various-folders/</loc>
     <lastmod>2020-05-14T00:00:00+00:00</lastmod>
   </url>
   

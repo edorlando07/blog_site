@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>Loading Multiple Files from Various Folders Using R</title>
-      <link>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</link>
+      <title>Loading Multiple Files from Various Folders</title>
+      <link>/2020/05/14/loading-multiple-files-from-various-folders/</link>
       <pubDate>Thu, 14 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</guid>
+      <guid>/2020/05/14/loading-multiple-files-from-various-folders/</guid>
       <description>Author: Ed OrlandoProblem StatementThis tutorial shows you how to load multiple files from multiple folders using R.
 As a bonus, this article will also show you how to add the folder and file names to the final tibble.
 

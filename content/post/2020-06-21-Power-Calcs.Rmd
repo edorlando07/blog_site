@@ -1,5 +1,5 @@
 ---
-title: "Examining Power Calculations Using R"
+title: "Examining Power Calculations"
 author: "Ed Orlando"
 date: '2020-06-21'
 categories: ["R"]
@@ -292,6 +292,11 @@ As witnessed in the graph above, the effect size can dramatically impact the sam
 As mentioned earlier, calculating the sample size can be a much more complicated analysis if some of the data is unknown.  Estimating the mean differences, and standard deviations of the two groups is often a collective effort that involves statisticians as well as subject matter experts.
 
 If you are interested in learning more about power calculations and all its parts, please check out the awesome references below.
+
+<br>
+For questions related to this analysis, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.  
+
+For access to more of my articles, please check out my **[blog](<https://ed-orlando-07-blog-site.netlify.app/>)**.
 
 ## References
 * Title:  Power Analysis, Clearly Explained  

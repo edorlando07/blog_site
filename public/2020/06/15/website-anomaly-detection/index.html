@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.72.0" />
+
+
+<title>Website Anomaly Detection - A Hugo website</title>
+<meta property="og:title" content="Website Anomaly Detection - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+  <meta property="description" content="This blog walks viewers through how to utilize the anomalize package in R.">
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="75"
+         height="75"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://ed-orlando07-home.netlify.app/">@Home</a></li>
+    
+    <li><a href="/">Blog</a></li>
+    
+    <li><a href="https://ed-orlando07.netlify.app/pdfs/CV_Orlando.pdf">CV</a></li>
+    
+    <li><a href="https://github.com/edorlando07/blog_site">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">5 min read</span>
+    
+
+    <h1 class="article-title">Website Anomaly Detection</h1>
+
+    
+    <span class="article-date">2020-06-15</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Written by: Ed Orlando, Data Scientist
+<br><br></p>
+<div id="project-description" class="section level2">
+<h2>Project Description</h2>
+<p>Anomaly detection can be valuable in many ways. For example, anomalies can be used to detect fraud, better understand system health monitoring, or help data engineers identify spikes in website traffic. It can also be used to remove extreme outliers from datasets before modeling.</p>
+<p>In this project, webpage traffic outliers were identified that utilized data from the calendar year 2016. The project focused on popular United States sports, entertainment, and political events and people.</p>
+<p>This project applied the <strong><a href="https://business-science.github.io/anomalize/">anomalize</a></strong> package to assist in identifying outliers.
+<br><br></p>
+</div>
+<div id="interactive-tableau-public-viz" class="section level2">
+<h2>Interactive Tableau Public Viz</h2>
+<p>A Tableau interactive viz was created that used the final output produced in this project. The interactive viz can be viewed by clicking the link below.</p>
+<p><strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">Website Anomaly Detection App</a></strong>.
+<br><br></p>
+</div>
+<div id="load-libraries" class="section level2">
+<h2>Load Libraries</h2>
+<p>To get started, install/load the libraries listed below.</p>
+<pre class="r"><code># 1.0 LIBRARIES ----
+library(vroom)
+library(tidyverse)
+library(tidyquant)
+library(lubridate)
+library(rsample)
+library(anomalize)
+library(fuzzyjoin)
+library(readxl)</code></pre>
+<p><br></p>
+</div>
+<div id="load-data" class="section level2">
+<h2>Load Data</h2>
+<p>The original raw web data file included in the project can be downloaded <strong><a href="https://www.kaggle.com/c/web-traffic-time-series-forecasting/data">here.</a></strong> The raw data was modified in a prior project I have offline since the original raw data file was very large (271 MB). I also created a couple lookup tables that create valuable features later in the pipeline.</p>
+<p>To follow along, click <strong><a href="https://ed-orlando-07-blog-site.netlify.app/zip_files/Anomalize.zip">here</a></strong> to download the sample files.</p>
+<pre class="r"><code># 2.0 LOAD DATA ----
+websites_sample_tbl &lt;- vroom::vroom(&quot;Data_Sources/2020_06_15_Anomalize/websites_sample_tbl.csv&quot;, delim = &quot;,&quot;)
+page_summary_lkp_tbl &lt;- read_xlsx(&quot;Data_Sources/2020_06_15_Anomalize/Topics_Dates_LKP.xlsx&quot;, sheet = &quot;Sheet1&quot;)
+topics_dates_lkp_tbl &lt;- read_xlsx(&quot;Data_Sources/2020_06_15_Anomalize/Topics_Dates_LKP.xlsx&quot;, sheet = &quot;Sheet2&quot;)</code></pre>
+<p><br></p>
+<p>Subsets of the three (3) tibbles are listed below. The tibbles include information related to website traffic visits, the topic summary, details about the outliers, and the sources and links to the details.</p>
+<pre class="r"><code>head(websites_sample_tbl)
+## # A tibble: 6 x 4
+##    ...1 date       visits Page_Summary
+##   &lt;dbl&gt; &lt;date&gt;      &lt;dbl&gt; &lt;chr&gt;       
+## 1     1 2015-10-01    683 1999_       
+## 2     2 2015-10-02    836 1999_       
+## 3     3 2015-10-03    742 1999_       
+## 4     4 2015-10-04    934 1999_       
+## 5     5 2015-10-05    778 1999_       
+## 6     6 2015-10-06    824 1999_</code></pre>
+<pre class="r"><code>head(page_summary_lkp_tbl)
+## # A tibble: 6 x 3
+##   Category              Page_Summary      Page_Summary_Formatted
+##   &lt;chr&gt;                 &lt;chr&gt;             &lt;chr&gt;                 
+## 1 Music &amp; Entertainment The_Force_Awakens The Force Awakens     
+## 2 Music &amp; Entertainment Leonardo_DiCaprio Leonardo DiCaprio     
+## 3 Music &amp; Entertainment Matt_Damon        Matt Damon            
+## 4 Music &amp; Entertainment Brie_Larson       Brie Larson           
+## 5 Music &amp; Entertainment Room_             Room                  
+## 6 Music &amp; Entertainment Joy_              Joy</code></pre>
+<pre class="r"><code>head(topics_dates_lkp_tbl)
+## # A tibble: 6 x 4
+##   Page_Summary date                Description                Source            
+##   &lt;chr&gt;        &lt;dttm&gt;              &lt;chr&gt;                      &lt;chr&gt;             
+## 1 1999_        2016-04-21 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~
+## 2 1999_        2016-04-22 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~
+## 3 1999_        2016-04-23 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~
+## 4 1999_        2016-04-24 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~
+## 5 1999_        2016-04-25 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~
+## 6 1999_        2016-04-26 00:00:00 On Apr 21, 2016, music le~ https://en.wikipe~</code></pre>
+<p><br>
+<br></p>
+</div>
+<div id="finding-anomalies" class="section level2">
+<h2>Finding Anomalies</h2>
+<p>A few handy functions in the <strong><a href="https://business-science.github.io/anomalize/">anomalize</a></strong> package were included in the analysis. The official descriptions included in the site above are listed below.</p>
+<ul>
+<li>time_decompose(): Separates the time series into seasonal, trend, and remainder components<br />
+</li>
+<li>anomalize(): Applies anomaly detection methods to the remainder component.<br />
+</li>
+<li>recomposed_l1 &amp; recomposed_l2: added to calculate the limits that separate the “normal” data from the anomalies.</li>
+</ul>
+<pre class="r"><code>## ANOMALY DETECTION -----
+websites_anomalies_tbl &lt;- websites_sample_tbl %&gt;%
+    group_by(Page_Summary) %&gt;%
+    filter(is.na(date) == FALSE) %&gt;%
+    time_decompose(visits, method = &quot;stl&quot;) %&gt;%
+    anomalize(remainder, method = &quot;iqr&quot;, alpha = 0.014) %&gt;%
+    mutate(recomposed_l1 = season + trend + remainder_l1) %&gt;%
+    mutate(recomposed_l2 = season + trend + remainder_l2)</code></pre>
+<pre class="r"><code>websites_anomalies_tbl %&gt;% glimpse()
+## Rows: 16,488
+## Columns: 11
+## Groups: Page_Summary [36]
+## $ Page_Summary  &lt;chr&gt; &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;,...
+## $ date          &lt;date&gt; 2015-10-01, 2015-10-02, 2015-10-03, 2015-10-04, 2015...
+## $ observed      &lt;dbl&gt; 683, 836, 742, 934, 778, 824, 892, 803, 884, 901, 923...
+## $ season        &lt;dbl&gt; -11.146825, 4.998995, 28.794452, 41.643661, -11.54451...
+## $ trend         &lt;dbl&gt; 816.7495, 815.6226, 814.4956, 813.3686, 812.2417, 811...
+## $ remainder     &lt;dbl&gt; -122.6027225, 15.3784293, -101.2900551, 78.9877085, -...
+## $ remainder_l1  &lt;dbl&gt; -1940.961, -1940.961, -1940.961, -1940.961, -1940.961...
+## $ remainder_l2  &lt;dbl&gt; 1979.766, 1979.766, 1979.766, 1979.766, 1979.766, 197...
+## $ anomaly       &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;,...
+## $ recomposed_l1 &lt;dbl&gt; -1135.359, -1120.340, -1097.671, -1085.949, -1140.264...
+## $ recomposed_l2 &lt;dbl&gt; 2785.368, 2800.387, 2823.056, 2834.778, 2780.463, 276...</code></pre>
+<p><br></p>
+<p>Finally, an example of the anomalies viewed in R is listed below. The anomalize package includes a plot_anomalies() function that easily identifies the outliers.</p>
+<p>In 2016, the Chicago Cubs were in the playoffs and eventually won the World Series. The popularity of that event is obviously apparent in the visual below.</p>
+<pre class="r"><code>websites_anomalies_tbl %&gt;%
+  filter(Page_Summary == &quot;Chicago_Cubs&quot;) %&gt;%
+  filter(date &gt;= as.Date(&quot;2016-01-01&quot;)) %&gt;%
+  plot_anomalies(ncol = 2, time_recomposed = TRUE)</code></pre>
+<p><img src="/post/2020-06-15-Anomalize_files/figure-html/unnamed-chunk-8-1.png" width="100%" /></p>
+<p>To view the fully interactive Tableau Public viz with all 2016 popular topics listed, please click <strong><a href="https://public.tableau.com/profile/ed.orlando#!/vizhome/WebsiteAnomalyDetection/WebsiteAnomalyDetection">here.</a></strong></p>
+<p><br>
+<br></p>
+</div>
+<div id="final-tidy-tibble-with-proper-titles-descriptions" class="section level2">
+<h2>Final Tidy Tibble With Proper Titles &amp; Descriptions</h2>
+<p>Finally, we can add the web page Category, Proper Title, Description of Outlier Event, and the Source. This tibble is what is exported and loaded into the Tableau Public viz.</p>
+<pre class="r"><code>websites_tidy_tbl &lt;- websites_anomalies_tbl %&gt;%
+    left_join(page_summary_lkp_tbl) %&gt;%
+    left_join(topics_dates_lkp_tbl)</code></pre>
+<pre class="r"><code>websites_tidy_tbl %&gt;% glimpse()
+## Rows: 16,490
+## Columns: 15
+## Groups: Page_Summary [36]
+## $ Page_Summary           &lt;chr&gt; &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;, &quot;1999_&quot;,...
+## $ date                   &lt;dttm&gt; 2015-10-01, 2015-10-02, 2015-10-03, 2015-10...
+## $ observed               &lt;dbl&gt; 683, 836, 742, 934, 778, 824, 892, 803, 884,...
+## $ season                 &lt;dbl&gt; -11.146825, 4.998995, 28.794452, 41.643661, ...
+## $ trend                  &lt;dbl&gt; 816.7495, 815.6226, 814.4956, 813.3686, 812....
+## $ remainder              &lt;dbl&gt; -122.6027225, 15.3784293, -101.2900551, 78.9...
+## $ remainder_l1           &lt;dbl&gt; -1940.961, -1940.961, -1940.961, -1940.961, ...
+## $ remainder_l2           &lt;dbl&gt; 1979.766, 1979.766, 1979.766, 1979.766, 1979...
+## $ anomaly                &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;N...
+## $ recomposed_l1          &lt;dbl&gt; -1135.359, -1120.340, -1097.671, -1085.949, ...
+## $ recomposed_l2          &lt;dbl&gt; 2785.368, 2800.387, 2823.056, 2834.778, 2780...
+## $ Category               &lt;chr&gt; &quot;Music &amp; Entertainment&quot;, &quot;Music &amp; Entertainm...
+## $ Page_Summary_Formatted &lt;chr&gt; &quot;Prince&quot;, &quot;Prince&quot;, &quot;Prince&quot;, &quot;Prince&quot;, &quot;Pri...
+## $ Description            &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+## $ Source                 &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...</code></pre>
+<p><br>
+For questions related to this analysis, please message me on <strong><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></strong>.</p>
+<p>For access to more of my articles, please check out my <strong><a href="https://ed-orlando-07-blog-site.netlify.app/">blog</a></strong>.</p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

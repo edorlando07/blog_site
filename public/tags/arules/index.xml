@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>Build a Spotify Playlist Recommendation Model Using R</title>
-      <link>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</link>
+      <title>Build a Spotify Playlist Recommendation Model</title>
+      <link>/2020/05/18/build-a-spotify-playlist-recommendation-model/</link>
       <pubDate>Mon, 18 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</guid>
+      <guid>/2020/05/18/build-a-spotify-playlist-recommendation-model/</guid>
       <description>Author: Ed OrlandoRecognition &amp;amp; CreditThis article and its contents were heavily influenced by Matt Dancho’s Learning Labs Pro: Session #11.
 
 Interactive Playlist ApplicationIf you are interested in creating your own playlist, please check out the Spotify Playlist Recommendation Shiny App.

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.72.0" />
+
+
+<title>Exploring Expected Values With R - A Hugo website</title>
+<meta property="og:title" content="Exploring Expected Values With R - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="75"
+         height="75"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://ed-orlando07-home.netlify.app/">@Home</a></li>
+    
+    <li><a href="/">Blog</a></li>
+    
+    <li><a href="https://ed-orlando07.netlify.app/pdfs/CV_Orlando.pdf">CV</a></li>
+    
+    <li><a href="https://github.com/edorlando07/blog_site">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">9 min read</span>
+    
+
+    <h1 class="article-title">Exploring Expected Values With R</h1>
+
+    
+    <span class="article-date">2020-06-24</span>
+    
+
+    <div class="article-content">
+      
+
+
+<div id="introduction-and-problem-statement" class="section level2">
+<h2>Introduction and Problem Statement</h2>
+<p>Expected values can be a little tricky to understand the first time around. However, they can be valuable in understanding how to assign business value to given probabilities.</p>
+</div>
+<div id="solution-to-the-statement" class="section level2">
+<h2>Solution to the Statement</h2>
+<p>Using some simple and more advanced examples, this article will help explain the mystery behind Expected Values. The various examples will tabularly and graphically show how these probabilities and expected values are calculated.</p>
+</div>
+<div id="gratitude-motivation" class="section level2">
+<h2>Gratitude &amp; Motivation</h2>
+<p>Inspiration for this post comes from Josh Starmer’s StatQuest video on <a href="https://www.youtube.com/watch?v=fU2PuYKsr6M&amp;feature=youtu.be">Expected Values</a>. As I’ve stated in other posts, I love Josh’s delivery and his videos are awesome references to learn and freshen up on all types of statisitcal topics. He has many videos on his site and I highly recommend them.</p>
+</div>
+<div id="expected-value-defined" class="section level2">
+<h2>Expected Value Defined</h2>
+<p>Expected Values and Probability are two very important foundations of statitics.</p>
+<p>According to the <a href="https://www.statlect.com/fundamentals-of-probability/expected-value">StatLect</a> website,
+Expected value "was first devised in the 17th century to analyze gambling games and answer questions such as:</p>
+<ul>
+<li>how much do I gain - or lose - on average, if I repeatedly play a given gambling game?<br />
+</li>
+<li>how much can I expect to gain - or lose - by making a certain bet?</li>
+</ul>
+<p>If the possible outcomes of the game (or the bet) and their associated probabilities are described by a random variable, then these questions can be answered by computing its expected value.</p>
+<p>The expected value is a weighted average of the possible realizations of the random variable (the possible outcomes of the game). Each realization is weighted by its probability" (Marco Taboga, PhD).</p>
+</div>
+<div id="load-libraries" class="section level2">
+<h2>Load Libraries</h2>
+<p>Before we get started, let’s load some libraries.</p>
+<pre class="r"><code>library(tidyverse)
+library(knitr)</code></pre>
+</div>
+<div id="setting-up-the-data-set-and-probabilities" class="section level2">
+<h2>Setting Up the Data Set and Probabilities</h2>
+<p>Let’s assume that we randomly asked 300 individuals if they prefer vanilla or chocolate ice cream. Let’s also assume that they had to choose one or the other and there were no ties. After the survey, there were 220 individuals that preferred chocolate and 80 that perferred vanilla.</p>
+<p>Once we have tallied the survey results, we can then calculate the probability of a person preferring either vanilla or chocolate ice cream as shown below.</p>
+<pre class="r"><code>data_set_01 &lt;- data_set_01 %&gt;%
+  mutate(total_n_size = sum(n_size),
+         probability  = round(n_size/total_n_size,4))
+
+data_set_01</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   ice_cream_type n_size total_n_size probability
+##   &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+## 1 Vanilla            37          213       0.174
+## 2 Chocolate         176          213       0.826</code></pre>
+<p>Now let’s assume that your friend Tommy is a huge vanilla ice cream fan and cannot believe the survey results. Tommy is so confident that he tells you that for the next 100 people that you ask, he will give you one dollar for every chocolate fan and you will have to pay him one dollar for every vanilla fan.</p>
+<p>As mentioned earlier, some questions you might want to answer include the following:</p>
+</div>
+<div id="q1-how-much-do-i-gain---or-lose---on-average-if-i-repeatedly-play-a-given-gambling-game" class="section level2">
+<h2>Q1: How much do I gain - or lose - on average, if I repeatedly play a given gambling game?</h2>
+<p>Although he is a huge fan of vanilla ice cream and he doesn’t beleive the original survey results, let’s assume that the probabilities given above are respresetnative of the population. Let’s plug in the outcomes and calcualte the</p>
+<pre class="r"><code>outcome &lt;- tibble(outcome = c(-1, 1))
+
+data_set_01 &lt;- cbind(data_set_01, outcome) %&gt;%
+  mutate(expected_prob = probability * outcome,
+         num_new_bets  = 100,
+         expected_value = expected_prob * num_new_bets) 
+
+kable(data_set_01)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">ice_cream_type</th>
+<th align="right">n_size</th>
+<th align="right">total_n_size</th>
+<th align="right">probability</th>
+<th align="right">outcome</th>
+<th align="right">expected_prob</th>
+<th align="right">num_new_bets</th>
+<th align="right">expected_value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Vanilla</td>
+<td align="right">37</td>
+<td align="right">213</td>
+<td align="right">0.1737</td>
+<td align="right">-1</td>
+<td align="right">-0.1737</td>
+<td align="right">100</td>
+<td align="right">-17.37</td>
+</tr>
+<tr class="even">
+<td align="left">Chocolate</td>
+<td align="right">176</td>
+<td align="right">213</td>
+<td align="right">0.8263</td>
+<td align="right">1</td>
+<td align="right">0.8263</td>
+<td align="right">100</td>
+<td align="right">82.63</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, we can sum the two expected value rows together to get the expected winnings after 100 bets, which is equal to about $66 - $83 minus $17. In other words, on average, we would expect to win about $66.</p>
+</div>
+<div id="q2-how-much-can-i-expect-to-gain---or-lose---by-making-a-certain-bet" class="section level2">
+<h2>Q2: How much can I expect to gain - or lose - by making a certain bet?</h2>
+<p>Since there were 100 bets made, we can expect to win about $0.66 every time we bet. Remember, this assumes multiple bets, and although we are betting $1 for each bet, the $0.66 represents winnings over multiple bets. We can add that to the data set as well.</p>
+<pre class="r"><code>certain_bet_amount &lt;- data_set_01 %&gt;%
+  summarise(certain_bet = sum(expected_value) / max(num_new_bets))
+
+certain_bet_amount</code></pre>
+<pre><code>##   certain_bet
+## 1      0.6526</code></pre>
+</div>
+<div id="q3-how-many-times-should-you-bet-to-guarantee-positive-winnings" class="section level2">
+<h2>Q3: How many times should you bet to guarantee positive winnings?</h2>
+<p>This is a tricky question to answer, but in general if your expected net probability of winning is greater than 0.50, than the more times you bet, the better your chances. We will simulate some examples below. for all the examples below, we will assume the same probabilties that were presented earlier.</p>
+<div id="three-3-bet-experiments" class="section level5">
+<h5>Three (3) Bet Experiments</h5>
+<p>Let’s assume that you bet your friend just three (3) times instead of 100 times. In theory, this strategy would increase the risk of having to pay your friend, even though the odds are completely in your favor. So let’s prove it out with a 100 experiments.</p>
+<p>We will assign 3 random values between 0 and 1 for each of the 100 experiments. If one of the random numbers is less than 0.1737, then you lose a dollar, otherwise you gain a dollar. We will tally up the totals for each experiment, and count how many times you were in the red versus in the black.</p>
+<pre class="r"><code>set.seed(1324)
+
+three_bet_experiment &lt;- tibble(
+  experiment_num = rep(c(1:100), each = 3),
+  random_value   = runif(300, 0, 1))
+  
+three_bet_experiment &lt;- three_bet_experiment %&gt;%
+  mutate(win_loss = case_when(random_value &lt;= 0.1737 ~ -1,
+                              TRUE ~ 1))</code></pre>
+<p>Let’s take a look at how the data set looks before we summarise the results.</p>
+<pre class="r"><code>head(three_bet_experiment)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   experiment_num random_value win_loss
+##            &lt;int&gt;        &lt;dbl&gt;    &lt;dbl&gt;
+## 1              1       0.0733       -1
+## 2              1       0.602         1
+## 3              1       0.961         1
+## 4              2       0.977         1
+## 5              2       0.0578       -1
+## 6              2       0.637         1</code></pre>
+<p>Now we can tally up the results of each of the 100 experiments.</p>
+<pre class="r"><code>three_bet_aggr &lt;- three_bet_experiment %&gt;%
+  group_by(experiment_num) %&gt;%
+  summarise(win_loss_sum = sum(win_loss)) %&gt;%
+  ungroup() %&gt;%
+  mutate(win_loss_bucket = case_when(win_loss_sum &lt; 0 ~ str_c(&quot;Loss of $&quot;, abs(win_loss_sum)),
+                                     TRUE ~ str_c(&quot;Winnings of $&quot;, win_loss_sum))) %&gt;%
+  mutate(win_loss_tally = 1)</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>head(three_bet_aggr)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   experiment_num win_loss_sum win_loss_bucket win_loss_tally
+##            &lt;int&gt;        &lt;dbl&gt; &lt;chr&gt;                    &lt;dbl&gt;
+## 1              1            1 Winnings of $1               1
+## 2              2            1 Winnings of $1               1
+## 3              3            1 Winnings of $1               1
+## 4              4            3 Winnings of $3               1
+## 5              5            3 Winnings of $3               1
+## 6              6            1 Winnings of $1               1</code></pre>
+<p>To set up the bar chart, let’s aggregate the results.</p>
+<pre class="r"><code>three_bet_graph &lt;- three_bet_aggr %&gt;%
+  select(win_loss_bucket, win_loss_tally) %&gt;%
+  group_by(win_loss_bucket) %&gt;%
+  summarise(win_loss_tally = sum(win_loss_tally)) %&gt;%
+  ungroup()</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<p>Next, we can visualise how each of those betting scenarios played out over 100 experiments. Remember, there are only 3 possible outcomes for each experiment. You can either win $3, win $1, or, in some rare cases, actually lose $1.</p>
+<pre class="r"><code>g &lt;- ggplot(three_bet_graph) +
+  geom_col(aes(win_loss_bucket, x = win_loss_tally)) + 
+  geom_text(aes(x = win_loss_tally + 1, 
+                y = win_loss_bucket, 
+                label = win_loss_tally)) +
+  theme_classic() +
+  xlab(label = &quot;&quot;) +
+  ylab(label = &quot;&quot;) +
+  labs(title = &quot;Betting Outcome Summary&quot;,
+       subtitle = &quot;3 Bets for 100 Experiments&quot;)
+  
+g</code></pre>
+<p><img src="/post/2020-06-24-Expected-Values_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Since each experiment only includes 3 experiments, the odds of you having to pay out money to your friend is approximately 10% despite having the odds heavily in your favor.</p>
+</div>
+<div id="multiple-betting-experiment-examples" class="section level5">
+<h5>Multiple Betting Experiment Examples</h5>
+<p>We still have not answered the question of how many bets do you need to have with your friend to almost guarantee a victory? In other words, instead of you having a 90% chance of not having to pay, how many bets in a row would it take to get around a 99% chance of not having to pay?</p>
+<p>Let’s set up various betting scenarios and visualize the probabilities.</p>
+<pre class="r"><code>set.seed(123)
+
+bet_scenario_tbl &lt;- rbind(
+  str_c(rep(c(1:1), each = 100), &quot; Bet&quot;) %&gt;% enframe(),
+  str_c(rep(c(3:3), each = 300), &quot; Bet&quot;) %&gt;% enframe(),
+  str_c(rep(c(5:5), each = 500), &quot; Bet&quot;) %&gt;% enframe(),
+  str_c(rep(c(7:7), each = 700), &quot; Bet&quot;) %&gt;% enframe(),
+  str_c(rep(c(9:9), each = 900), &quot; Bet&quot;) %&gt;% enframe()
+  ) %&gt;%
+  rename(bet_scenario = value)
+
+
+experiment_num_tbl &lt;- rbind(
+  rep(c(1:100), each = 1) %&gt;% enframe(),
+  rep(c(1:100), each = 3) %&gt;% enframe(),
+  rep(c(1:100), each = 5) %&gt;% enframe(),
+  rep(c(1:100), each = 7) %&gt;% enframe(),
+  rep(c(1:100), each = 9) %&gt;% enframe()
+  ) %&gt;%
+  rename(experiment_num = value)
+
+
+random_value_tbl &lt;- runif(2500, 0, 1) %&gt;% enframe() %&gt;%
+  rename(random_value = value)
+
+mult_bet_scenario_tbl &lt;- cbind(bet_scenario_tbl, experiment_num_tbl, random_value_tbl) %&gt;%
+  select(bet_scenario, experiment_num, random_value)</code></pre>
+<p>Now that the data is set up, let’s add the same calculated fields as we did earlier.</p>
+<pre class="r"><code>mult_bet_scenario_tbl &lt;- mult_bet_scenario_tbl %&gt;%
+  mutate(win_loss = case_when(random_value &lt;= 0.1737 ~ -1,
+                              TRUE ~ 1))</code></pre>
+<p>Now we can tally up the results of each of the 100 experiments for each of the betting scenarios.</p>
+<pre class="r"><code>mult_bet_scenario_aggr &lt;- mult_bet_scenario_tbl %&gt;%
+  group_by(bet_scenario, experiment_num) %&gt;%
+  summarise(win_loss_sum = sum(win_loss)) %&gt;%
+  ungroup() %&gt;%
+  mutate(win_loss_bucket = case_when(win_loss_sum &lt; 0 ~ &quot;Number of Times You Owe&quot;,
+                                     TRUE ~ &quot;Number of Times You Collect&quot;)) %&gt;%
+  mutate(win_loss_tally = 1)</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;bet_scenario&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>head(mult_bet_scenario_aggr)</code></pre>
+<pre><code>## # A tibble: 6 x 5
+##   bet_scenario experiment_num win_loss_sum win_loss_bucket        win_loss_tally
+##   &lt;chr&gt;                 &lt;int&gt;        &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt;
+## 1 1 Bet                     1            1 Number of Times You C~              1
+## 2 1 Bet                     2            1 Number of Times You C~              1
+## 3 1 Bet                     3            1 Number of Times You C~              1
+## 4 1 Bet                     4            1 Number of Times You C~              1
+## 5 1 Bet                     5            1 Number of Times You C~              1
+## 6 1 Bet                     6           -1 Number of Times You O~              1</code></pre>
+<p>To set up the bar charts, let’s aggregate the results.</p>
+<pre class="r"><code>mult_bet_scenario_graph &lt;- mult_bet_scenario_aggr %&gt;%
+  select(bet_scenario, win_loss_bucket, win_loss_tally) %&gt;%
+  group_by(bet_scenario, win_loss_bucket) %&gt;%
+  summarise(win_loss_tally = sum(win_loss_tally)) %&gt;%
+  ungroup()</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;bet_scenario&#39; (override with `.groups` argument)</code></pre>
+<p>Next, we can visualise mutliple betting scenarios played out over 100 experiments each. In other words, how do your chances of not having to pay increase with the number of consecutive bets made.</p>
+<pre class="r"><code>g &lt;- ggplot(mult_bet_scenario_graph, aes(x = reorder(win_loss_bucket, win_loss_tally), 
+                                         y = win_loss_tally)) + 
+  geom_bar(stat = &quot;identity&quot;) +
+  geom_text(aes(x = win_loss_bucket, 
+                y = win_loss_tally + 10, 
+                label = win_loss_tally)) +
+  coord_flip() +
+  theme_classic() +
+  xlab(label = &quot;&quot;) +
+  ylab(label = &quot;&quot;) +
+  labs(title = &quot;Betting Outcome Summary&quot;,
+       subtitle = &quot;Out of 100 Simulations for Each &quot;) +
+  
+  facet_wrap( ~ bet_scenario, ncol = 3)
+  
+g</code></pre>
+<p><img src="/post/2020-06-24-Expected-Values_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Odds of having to pay on one (1) single bet. If you bet your friend that the next individual</p>
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

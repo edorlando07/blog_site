@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>Website Anomaly Detection Using R &amp; Tableau</title>
-      <link>/2020/06/15/website-anomaly-detection-using-r-tableau/</link>
+      <title>Website Time Series Anomaly Detection</title>
+      <link>/2020/06/15/website-time-series-anomaly-detection/</link>
       <pubDate>Mon, 15 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/06/15/website-anomaly-detection-using-r-tableau/</guid>
+      <guid>/2020/06/15/website-time-series-anomaly-detection/</guid>
       <description>Written by: Ed Orlando, Data ScientistProject DescriptionAnomaly detection can be valuable in many ways. For example, anomalies can be used to detect fraud, better understand system health monitoring, or help data engineers identify spikes in website traffic. It can also be used to remove extreme outliers from datasets before modeling.
 In this project, webpage traffic outliers were identified that utilized data from the calendar year 2016. The project focused on popular United States sports, entertainment, and political events and people.</description>
     </item>

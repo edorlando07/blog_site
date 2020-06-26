@@ -6,27 +6,39 @@
     <description>Recent content in R Markdown on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 21 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/r-markdown/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Examining Power Calculations Using R</title>
-      <link>/2020/06/21/examining-power-calculations-using-r/</link>
+      <title>Exploring Expected Values</title>
+      <link>/2020/06/24/exploring-expected-values/</link>
+      <pubDate>Wed, 24 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/06/24/exploring-expected-values/</guid>
+      <description>Author: Ed Orlando
+IntroductionExpected values can be a little tricky to understand the first time around. Using some simple and more advanced examples, this article will help you understand the mystery behind Expected Values. We will specifically answer the following questions with the help of R:
+Q1: How much do I gain - or lose - on average, if I repeatedly play a given gambling game?
+Q2: How much can I expect to gain - or lose - by making a certain bet?</description>
+    </item>
+    
+    <item>
+      <title>Examining Power Calculations</title>
+      <link>/2020/06/21/examining-power-calculations/</link>
       <pubDate>Sun, 21 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/06/21/examining-power-calculations-using-r/</guid>
+      <guid>/2020/06/21/examining-power-calculations/</guid>
       <description>Author: Ed Orlando
 Introduction &amp;amp; Problem StatementCalculating sample sizes while accounting for power is fairly straight-forward if you have all the required inputs. Many universities have online calculators that help you determine the appropriate sample size. The variables needed to calculate the sample size while accounting for power are listed below. This article will utilize Cohen’s d calculations in the examples presented. If you are unfamiliar with any of the terms below, please click on any of the symbols for more information.</description>
     </item>
     
     <item>
-      <title>Build a Spotify Playlist Recommendation Model Using R</title>
-      <link>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</link>
+      <title>Build a Spotify Playlist Recommendation Model</title>
+      <link>/2020/05/18/build-a-spotify-playlist-recommendation-model/</link>
       <pubDate>Mon, 18 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/05/18/build-a-spotify-playlist-recommendation-model-using-r/</guid>
+      <guid>/2020/05/18/build-a-spotify-playlist-recommendation-model/</guid>
       <description>Author: Ed OrlandoRecognition &amp;amp; CreditThis article and its contents were heavily influenced by Matt Dancho’s Learning Labs Pro: Session #11.
 
 Interactive Playlist ApplicationIf you are interested in creating your own playlist, please check out the Spotify Playlist Recommendation Shiny App.
@@ -35,11 +47,11 @@ Introduction &amp;amp; Problem StatementCalculating sample sizes while accounti
     </item>
     
     <item>
-      <title>Loading Multiple Files from Various Folders Using R</title>
-      <link>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</link>
+      <title>Loading Multiple Files from Various Folders</title>
+      <link>/2020/05/14/loading-multiple-files-from-various-folders/</link>
       <pubDate>Thu, 14 May 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/05/14/loading-multiple-files-from-various-folders-using-r/</guid>
+      <guid>/2020/05/14/loading-multiple-files-from-various-folders/</guid>
       <description>Author: Ed OrlandoProblem StatementThis tutorial shows you how to load multiple files from multiple folders using R.
 As a bonus, this article will also show you how to add the folder and file names to the final tibble.
 
