@@ -353,7 +353,7 @@ Note that the numbers above can vary slightly depending on how many experiments 
 
 To summarize, when calculating Expected Values, it is important to understand the probability and value assigned to each outcome and how many times you get to repeat an event.  
 
-When you increase the number of bets or events, you can increase your chances of a net win if the odds are in your favor.  That is why the casinos are so successful even when they only have a slight advantage.  The casinos have very slight overall advantages over the players.  However, casinos are able to bet thousands of times which dramatically increases their chances of having an overall net gain.  In other words, the phrase, house always wins is a very true statement.
+When you increase the number of bets or events, you can increase your chances of a net win if the odds are in your favor.  That is why the casinos are so successful even when they only have a slight advantage.  The casinos have very slight overall advantages over the players.  However, casinos are able to bet thousands of times which dramatically increases their chances of having an overall net gain.  The phrase, "the house always wins" is a very true statement.
 
 <br>
 For questions related to this analysis, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.  
