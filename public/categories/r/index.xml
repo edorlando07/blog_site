@@ -6,10 +6,21 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bootstrapping Confidence Intervals</title>
+      <link>/2020/07/07/bootstrapping-confidence-intervals/</link>
+      <pubDate>Tue, 07 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/07/07/bootstrapping-confidence-intervals/</guid>
+      <description>Author: Ed Orlando
+IntroductionBootstrapping is a simple, yet powerful method that helps you estimate confidence intervals that can be used to enhance your data analysis. Although there are many other ways to calculate confidence intervals for data sets, this article focuses solely on bootstrapping methods.
+According to Wikipedia, “bootstrapping is any test or metric that uses random sampling with replacement, and falls under the broader class of resampling methods.</description>
+    </item>
     
     <item>
       <title>Exploring Expected Values</title>

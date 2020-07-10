@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.72.0" />
+
+
+<title>Bootstrapping Confidence Intervals - A Hugo website</title>
+<meta property="og:title" content="Bootstrapping Confidence Intervals - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="75"
+         height="75"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://ed-orlando07-home.netlify.app/">@Home</a></li>
+    
+    <li><a href="/">Blog</a></li>
+    
+    <li><a href="https://ed-orlando-07-blog-site.netlify.app/pdfs/CV_Orlando.pdf">CV</a></li>
+    
+    <li><a href="https://github.com/edorlando07/blog_site">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">11 min read</span>
+    
+
+    <h1 class="article-title">Bootstrapping Confidence Intervals</h1>
+
+    
+    <span class="article-date">2020-07-07</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Author: Ed Orlando</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Bootstrapping is a simple, yet powerful method that helps you estimate confidence intervals that can be used to enhance your data analysis. Although there are many other ways to calculate confidence intervals for data sets, this article focuses solely on bootstrapping methods.</p>
+<p>According to Wikipedia, “bootstrapping is any test or metric that uses random sampling with replacement, and falls under the broader class of resampling methods. Bootstrapping assigns measures of accuracy (bias, variance, <strong>confidence intervals</strong>, prediction error, etc.) to sample estimates. This technique allows estimation of the sampling distribution of almost any statistic using random sampling methods.”</p>
+<p>This article will show you two ways to bootstrap in R. The first example will show you how to bootstrap the <strong>hard way</strong>. This will allow any viewers the opportunity to better understand how bootstrapping methods are built from scratch.</p>
+<p>The second example will show and you how to bootstrap the <strong>easy way</strong> using the new <strong><a href="https://infer-dev.netlify.app/">infer</a></strong> package. Since there is some randomness in bootstrapping methods, the 2 examples will show slight differences in the distributions. The <strong><a href="https://infer-dev.netlify.app/">infer</a></strong> package has many other awesome functions that are not covered in this article.</p>
+<p>As a side note, it is recommended that you have at least <strong>10 observations</strong> in your original experiment or data set when applying bootstrapping methods. The example presented in this article includes <strong>32 observations</strong> from the <strong>mtcars</strong> data set.</p>
+<p><br></p>
+</div>
+<div id="confidence-intervals-are-nice-additions" class="section level2">
+<h2>Confidence Intervals are Nice Additions</h2>
+<p>Although we only examine one set of data in this article, calculating confidence intervals on the means of replicated samples can be a valuable way of comparing 2 or more sets of distributions. In other words, visualizing confidence intervals can be a nice way of presenting how mean sampling errors compare amongst two or more groups of data.</p>
+<p><br></p>
+</div>
+<div id="gratitude-references" class="section level2">
+<h2>Gratitude &amp; References</h2>
+<p>Many of the theoretical topics discussed in this article are derived from <strong><a href="https://statquest.org/">Josh Starmer’s StatQuest</a></strong> videos listed below. Click on any of the links below to get a more detailed explanation related to bootstrapping, confidence intervals, and standard errors.</p>
+<ul>
+<li><strong><a href="https://www.youtube.com/watch?v=isEcgoCmlO0&amp;feature=youtu.be">Bootstrapping, Main Ideas</a></strong></li>
+<li><strong><a href="https://www.youtube.com/watch?v=XNgt7F6FqDU&amp;feature=youtu.be">The Standard Error</a></strong><br />
+</li>
+<li><strong><a href="https://www.youtube.com/watch?v=TqOeMYtOc1w&amp;feature=youtu.be">Confidence Intervals</a></strong></li>
+</ul>
+<p><br></p>
+</div>
+<div id="load-libraries" class="section level2">
+<h2>Load Libraries</h2>
+<p>Before we begin the analysis, let’s first load in a few libraries.</p>
+<pre class="r"><code>library(tidyverse)
+library(infer)
+library(scales)</code></pre>
+<p><br></p>
+</div>
+<div id="load-and-view-data" class="section level2">
+<h2>Load and View Data</h2>
+<p>We will utilize the well-known mtcars data set for the upcoming examples. The only value we are interested in analyzing in this article is the cars’ miles-per-gallon <strong>(mpg)</strong>.</p>
+<pre class="r"><code>mtcars %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 32
+## Columns: 11
+## $ mpg  &lt;dbl&gt; 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17...
+## $ cyl  &lt;dbl&gt; 6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4,...
+## $ disp &lt;dbl&gt; 160.0, 160.0, 108.0, 258.0, 360.0, 225.0, 360.0, 146.7, 140.8,...
+## $ hp   &lt;dbl&gt; 110, 110, 93, 110, 175, 105, 245, 62, 95, 123, 123, 180, 180, ...
+## $ drat &lt;dbl&gt; 3.90, 3.90, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3....
+## $ wt   &lt;dbl&gt; 2.620, 2.875, 2.320, 3.215, 3.440, 3.460, 3.570, 3.190, 3.150,...
+## $ qsec &lt;dbl&gt; 16.46, 17.02, 18.61, 19.44, 17.02, 20.22, 15.84, 20.00, 22.90,...
+## $ vs   &lt;dbl&gt; 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,...
+## $ am   &lt;dbl&gt; 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0,...
+## $ gear &lt;dbl&gt; 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3,...
+## $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1,...</code></pre>
+<p><br></p>
+</div>
+<div id="visualize-the-distribution-of-miles-per-gallon-mpg" class="section level2">
+<h2>Visualize the Distribution of Miles-Per-Gallon (mpg)</h2>
+<p>The distribution of the 32 original observations is listed below.</p>
+<pre class="r"><code>mtcars %&gt;% ggplot(aes(mpg)) +
+  geom_density() +
+  theme_classic()</code></pre>
+<p><img src="/post/2020-07-07-Bootstrap_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The <strong>mean</strong> for the individual sample set is <strong>20.09 mpg</strong> and the <strong>standard deviation</strong> is <strong>6.03</strong>. However, in this article we will concentrate on calculating the distribution of the mean using the bootstrapping method.</p>
+<p><br></p>
+</div>
+<div id="part-1-bootstrapping-the-hard-way" class="section level2">
+<h2>Part 1: Bootstrapping the Hard Way</h2>
+<p>As stated previously, we are analyzing the distribution of the means for mpg. In the code below, we selected the mpg column in the mtcars data set and also added a row number column.</p>
+<pre class="r"><code>mtcars_wt_tbl &lt;- mtcars %&gt;%
+  as_tibble() %&gt;%
+  select(mpg) %&gt;%
+  rownames_to_column()
+
+mtcars_wt_tbl</code></pre>
+<pre><code>## # A tibble: 32 x 2
+##    rowname   mpg
+##    &lt;chr&gt;   &lt;dbl&gt;
+##  1 1        21  
+##  2 2        21  
+##  3 3        22.8
+##  4 4        21.4
+##  5 5        18.7
+##  6 6        18.1
+##  7 7        14.3
+##  8 8        24.4
+##  9 9        22.8
+## 10 10       19.2
+## # ... with 22 more rows</code></pre>
+<p><br></p>
+<p>Listed below are the steps we will take to create a bootstrapping data set from scratch. As a reminder, there are <strong>32 observations</strong> in the mtcars data set.</p>
+<ul>
+<li><strong>Step 1:</strong> Set up a randomized generator that will select any of the 32 observations at random.</li>
+<li><strong>Step 2:</strong> Repeat Step 1 until 32 randomized observations are selected. It is imperative that duplicate selections are allowed in the randomized selection process.</li>
+<li><strong>Step 3:</strong> Once a randomized replicate of 32 is completed, we can repeat Steps 1 and 2 for a total of 1,000 times. Our unaggregated data set will consist of 32,000 records once these steps are completed.</li>
+</ul>
+<p><em>Note: Please note that in some bootstrapping exercises, replicates of 10,000 are often used.</em></p>
+<p><br></p>
+<div id="steps-1-and-2-set-up-randomized-generator-of-32-observations-allow-duplicates" class="section level4">
+<h4>Steps 1 and 2: Set Up Randomized Generator of 32 Observations (allow duplicates)</h4>
+<pre class="r"><code>set.seed(123)
+
+num_replicates &lt;- 1000
+num_rows       &lt;- mtcars %&gt;% nrow() 
+
+steps_01_02 &lt;- runif((num_replicates*num_rows), min=1, max=num_rows) %&gt;%
+  as_tibble() %&gt;%
+  mutate(value = round(value, 0))
+
+head(steps_01_02, 12)</code></pre>
+<pre><code>## # A tibble: 12 x 1
+##    value
+##    &lt;dbl&gt;
+##  1    10
+##  2    25
+##  3    14
+##  4    28
+##  5    30
+##  6     2
+##  7    17
+##  8    29
+##  9    18
+## 10    15
+## 11    31
+## 12    15</code></pre>
+<p>A total of 32 rows were randomly generated which allowed for duplicate row numbers. The data above lists the first 12 observations in the data set.</p>
+<p><br></p>
+</div>
+<div id="step-03-repeat-steps-1-and-2-for-a-total-of-1000-times" class="section level4">
+<h4>Step 03: Repeat Steps 1 and 2 for a Total of 1,000 Times</h4>
+<pre class="r"><code>step_03 &lt;- steps_01_02 %&gt;%
+  mutate(replicate = rep(1:num_replicates, each = num_rows)) %&gt;%
+  rename(rowname = value) %&gt;%
+  select(replicate, rowname) %&gt;%
+  mutate(rowname = as.character(rowname))
+  
+random_number_tbl &lt;- step_03
+
+glimpse(random_number_tbl)</code></pre>
+<pre><code>## Rows: 32,000
+## Columns: 2
+## $ replicate &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ rowname   &lt;chr&gt; &quot;10&quot;, &quot;25&quot;, &quot;14&quot;, &quot;28&quot;, &quot;30&quot;, &quot;2&quot;, &quot;17&quot;, &quot;29&quot;, &quot;18&quot;, &quot;15&quot;...</code></pre>
+<p>As you can see above, we have a total of 32,000 records (32 observations x 1,000 replicates).</p>
+<p>The original data set that included just the mpg for each car can now be joined to the randomized generator tibble. This will allow us to calculate the mean mpg for each of the 1,000 replicates as well as the 95% confidence interval.</p>
+<pre class="r"><code>bootstrap_part_1 &lt;- random_number_tbl %&gt;%
+  left_join(mtcars_wt_tbl)
+
+bootstrap_part_1 %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 32,000
+## Columns: 3
+## $ replicate &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ rowname   &lt;chr&gt; &quot;10&quot;, &quot;25&quot;, &quot;14&quot;, &quot;28&quot;, &quot;30&quot;, &quot;2&quot;, &quot;17&quot;, &quot;29&quot;, &quot;18&quot;, &quot;15&quot;...
+## $ mpg       &lt;dbl&gt; 19.2, 19.2, 15.2, 30.4, 19.7, 21.0, 14.7, 15.8, 32.4, 10....</code></pre>
+<p><br></p>
+<p>Next, we can calculate the mean mpg and the percentile for each iteration by using a helper function. We will use this function later on in Part 2.</p>
+<pre class="r"><code>aggregate_bootstrap_data &lt;- function(data) {
+  
+  data &lt;- data %&gt;%
+  select(replicate, mpg) %&gt;%
+  group_by(replicate) %&gt;%
+  summarise(mean_mpg = mean(mpg)) %&gt;%
+  ungroup() %&gt;%
+  mutate(percentile_rank = ntile(mean_mpg, 1000)) %&gt;%
+  mutate(percentile_rank = percentile_rank/10)
+  
+}
+
+bootstrap_part_1_agg &lt;- aggregate_bootstrap_data(bootstrap_part_1)
+
+bootstrap_part_1_agg %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 1,000
+## Columns: 3
+## $ replicate       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...
+## $ mean_mpg        &lt;dbl&gt; 19.52812, 19.15312, 19.68750, 19.34688, 19.61250, 2...
+## $ percentile_rank &lt;dbl&gt; 33.5, 20.0, 40.0, 28.1, 36.8, 75.3, 33.8, 72.2, 46....</code></pre>
+<p><br></p>
+<p>Using the percentile calculations above, we can easily identify the mean, the lower confidence interval and the upper confidence interval. For all of the examples, a 95% confidence interval is utilized.</p>
+<pre class="r"><code>perc_rank_50 &lt;- 50.0
+lower_ci     &lt;- 2.5
+upper_ci     &lt;- 97.5
+
+add_mean_ci_values &lt;- function(data, bootstrap_part) {
+  
+  data &lt;- data %&gt;% 
+    mutate(Group = bootstrap_part) %&gt;%
+
+    # mean
+    mutate(mean_value = case_when(percentile_rank == perc_rank_50 ~ mean_mpg,
+                                TRUE ~ 0)) %&gt;%
+    mutate(mean_value = max(mean_value)) %&gt;%
+
+    # lower confidence interval
+    mutate(lower_ci_value = case_when(percentile_rank == lower_ci ~ mean_mpg,
+                                TRUE ~ 0)) %&gt;%
+    mutate(lower_ci_value = max(lower_ci_value)) %&gt;%
+
+    # upper confidence interval
+    mutate(upper_ci_value = case_when(percentile_rank == upper_ci ~ mean_mpg,
+                                TRUE ~ 0)) %&gt;%
+    mutate(upper_ci_value = max(upper_ci_value))
+  
+}
+
+# Add mean and confience intervals to the data set and label the section we are on.
+bootstrap_part_1_final &lt;- add_mean_ci_values(bootstrap_part_1_agg, &quot;Part_01&quot;)
+
+bootstrap_part_1_final %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 1,000
+## Columns: 7
+## $ replicate       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...
+## $ mean_mpg        &lt;dbl&gt; 19.52812, 19.15312, 19.68750, 19.34688, 19.61250, 2...
+## $ percentile_rank &lt;dbl&gt; 33.5, 20.0, 40.0, 28.1, 36.8, 75.3, 33.8, 72.2, 46....
+## $ Group           &lt;chr&gt; &quot;Part_01&quot;, &quot;Part_01&quot;, &quot;Part_01&quot;, &quot;Part_01&quot;, &quot;Part_0...
+## $ mean_value      &lt;dbl&gt; 20.01562, 20.01562, 20.01562, 20.01562, 20.01562, 2...
+## $ lower_ci_value  &lt;dbl&gt; 18.00937, 18.00937, 18.00937, 18.00937, 18.00937, 1...
+## $ upper_ci_value  &lt;dbl&gt; 22.11563, 22.11563, 22.11563, 22.11563, 22.11563, 2...</code></pre>
+<p><br></p>
+<p>We can also graph these results to show the distribution of the bootstrapping results.</p>
+<pre class="r"><code>graph_distribution &lt;- function(data, title) {
+
+ggplot(data, 
+       aes(mean_mpg, fill = Group)) +
+  
+  geom_density(alpha = 0.8,
+               color = &quot;#555759&quot;, 
+               fill  = &quot;#D6DBE0&quot;) +
+  
+  geom_vline(aes(
+    xintercept = data$lower_ci_value[[1]]),
+    colour = &quot;red&quot;,
+    linetype = &quot;dashed&quot;) +
+  
+    geom_vline(aes(
+    xintercept = data$upper_ci_value[[1]]),
+    colour = &quot;red&quot;,
+    linetype = &quot;dashed&quot;) +
+  
+    geom_vline(aes(
+    xintercept = data$mean_value[[1]]),
+    colour = &quot;red&quot;,
+    linetype = &quot;solid&quot;) +
+  
+  geom_text(aes(data$lower_ci_value[[1]],
+                0, 
+                label = round(data$lower_ci_value[[1]],digits = 2), 
+                hjust = 1)) +
+  geom_text(aes(data$upper_ci_value[[1]],
+                0, 
+                label = round(data$upper_ci_value[[1]],digits = 2), 
+                hjust = 1)) +
+  geom_text(aes(bootstrap_part_1_final$mean_value[[1]],
+                0, 
+                label = round(data$mean_value[[1]],digits = 2), 
+                hjust = 1)) +
+  
+  labs(title    = title,
+       subtitle = &quot;Car MPG Replicate Mean and 95% Confidence Interval&quot;) +
+  
+  theme_classic() +
+  
+  theme(axis.text.x  = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.y  = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+}
+
+# Add data and title to function
+graph_distribution(bootstrap_part_1_final, &quot;Bootstrapping Part 1&quot;)</code></pre>
+<p><img src="/post/2020-07-07-Bootstrap_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>To summarize, the mean mpg of all car replicate sets is 20.02 mpg. Ninety-five (95%) of means of all car replicate sets are between 18.01 and 22.12 mpg. Any replicate data set that has a mean outside 18.01 and 22.12 mpg is considered an outlier.</p>
+<p><br></p>
+</div>
+</div>
+<div id="part-2-bootstrapping-the-easy-way" class="section level2">
+<h2>Part 2: Bootstrapping the Easy Way</h2>
+<p>In the example below, we will go through a much easier way of bootstrapping a single column of data using the infer package. The code in Part 1 that built the randomized table of 32,000 records was approximately 10 lines of code. The code below is only 3 lines.</p>
+<pre class="r"><code>set.seed(225)
+
+bootstrap_part_2 &lt;- mtcars_wt_tbl %&gt;%
+  specify(response = mpg) %&gt;%
+  generate(reps = 1000, type = &quot;bootstrap&quot;)
+
+glimpse(bootstrap_part_2)</code></pre>
+<pre><code>## Rows: 32,000
+## Columns: 2
+## Groups: replicate [1,000]
+## $ replicate &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ mpg       &lt;dbl&gt; 13.3, 15.8, 21.0, 10.4, 13.3, 22.8, 18.1, 16.4, 17.3, 32....</code></pre>
+<p><br></p>
+<p>Next, we calculate each iteration’s mean using the helper function we created in Part 1.</p>
+<pre class="r"><code>bootstrap_part_2_agg &lt;- aggregate_bootstrap_data(bootstrap_part_2)
+
+bootstrap_part_2_agg %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 1,000
+## Columns: 3
+## $ replicate       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...
+## $ mean_mpg        &lt;dbl&gt; 18.22500, 18.76562, 21.08125, 21.50937, 21.40312, 1...
+## $ percentile_rank &lt;dbl&gt; 4.6, 9.8, 83.4, 92.1, 90.4, 11.3, 85.2, 8.8, 68.2, ...</code></pre>
+<p><br></p>
+<p>The helper function below adds the mean and the confidence intervals just as we did in Part 1.</p>
+<pre class="r"><code># Add mean and confience intervals to the data set and label the section we are on.
+bootstrap_part_2_final &lt;- add_mean_ci_values(bootstrap_part_2_agg, &quot;Part_02&quot;)
+
+bootstrap_part_2_final %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 1,000
+## Columns: 7
+## $ replicate       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...
+## $ mean_mpg        &lt;dbl&gt; 18.22500, 18.76562, 21.08125, 21.50937, 21.40312, 1...
+## $ percentile_rank &lt;dbl&gt; 4.6, 9.8, 83.4, 92.1, 90.4, 11.3, 85.2, 8.8, 68.2, ...
+## $ Group           &lt;chr&gt; &quot;Part_02&quot;, &quot;Part_02&quot;, &quot;Part_02&quot;, &quot;Part_02&quot;, &quot;Part_0...
+## $ mean_value      &lt;dbl&gt; 20.13125, 20.13125, 20.13125, 20.13125, 20.13125, 2...
+## $ lower_ci_value  &lt;dbl&gt; 17.92813, 17.92813, 17.92813, 17.92813, 17.92813, 1...
+## $ upper_ci_value  &lt;dbl&gt; 22.05313, 22.05313, 22.05313, 22.05313, 22.05313, 2...</code></pre>
+<p><br></p>
+<p>Lastly, we can graph and label the new distribution.</p>
+<pre class="r"><code># Add data and title to function
+graph_distribution(bootstrap_part_2_final, &quot;Bootstrapping Part 2&quot;)</code></pre>
+<p><img src="/post/2020-07-07-Bootstrap_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>To summarize, the mean mpg of all car replicate sets is 20.13 mpg. Ninety-five (95%) of means of all car replicate sets are between 17.93 and 22.05 mpg. Any replicate data set that has a mean outside 17.93 and 22.05 mpg is considered an outlier.</p>
+<p><br></p>
+</div>
+<div id="summary-and-final-thoughts" class="section level2">
+<h2>Summary and Final Thoughts</h2>
+<p>Calculating confidence intervals on replicate sets of data is easily performed using bootstrapping methods. Bootstrapping has been more fully automated with the <strong><a href="https://infer-dev.netlify.app/">infer</a></strong> package. However, as with many statistical methods, it is often a good lesson to perform the math the long way before moving on to easier methods.</p>
+<p>Visualizing confidence intervals on the means of data sets can be a useful way of comparing two different groups of data sets. They can be a nice addition to a t-test or ANOVA analysis.</p>
+<p>For questions related to this analysis, please message me on <strong><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></strong>.</p>
+<p>For access to more of my articles, please check out my <strong><a href="https://ed-orlando-07-blog-site.netlify.app/">blog</a></strong>.</p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

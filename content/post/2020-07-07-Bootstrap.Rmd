@@ -1,0 +1,334 @@
+---
+title: "Bootstrapping Confidence Intervals"
+author: "Ed Orlando"
+date: 2020-07-07
+categories: ["R"]
+tags: ["R Markdown", "bootstrapping", "R Studio", "infer"]
+description: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Author: Ed Orlando
+
+## Introduction
+
+Bootstrapping is a simple, yet powerful method that helps you estimate confidence intervals that can be used to enhance your data analysis.  Although there are many other ways to calculate confidence intervals for data sets, this article focuses solely on bootstrapping methods.
+
+According to Wikipedia, "bootstrapping is any test or metric that uses random sampling with replacement, and falls under the broader class of resampling methods. Bootstrapping assigns measures of accuracy (bias, variance, **confidence intervals**, prediction error, etc.) to sample estimates. This technique allows estimation of the sampling distribution of almost any statistic using random sampling methods."
+
+This article will show you two ways to bootstrap in R.  The first example will show you how to bootstrap the **hard way**.  This will allow any viewers the opportunity to better understand how bootstrapping methods are built from scratch.  
+
+The second example will show and you how to bootstrap the **easy way** using the new **[infer](<https://infer-dev.netlify.app/>)** package.  Since there is some randomness in bootstrapping methods, the 2 examples will show slight differences in the distributions.  The **[infer](<https://infer-dev.netlify.app/>)** package has many other awesome functions that are not covered in this article.
+
+As a side note,  it is recommended that you have at least **10 observations** in your original experiment or data set when applying bootstrapping methods.  The example presented in this article includes **32 observations** from the **mtcars** data set.
+
+<br>
+
+## Confidence Intervals are Nice Additions
+
+Although we only examine one set of data in this article, calculating confidence intervals on the means of replicated samples can be a valuable way of comparing 2 or more sets of distributions.  In other words, visualizing confidence intervals can be a nice way of presenting how mean sampling errors compare amongst two or more groups of data. 
+
+<br>
+
+## Gratitude & References
+
+Many of the theoretical topics discussed in this article are derived from **[Josh Starmer's StatQuest](<https://statquest.org/>)** videos listed below.  Click on any of the links below to get a more detailed explanation related to bootstrapping, confidence intervals, and standard errors.  
+
+* **[Bootstrapping, Main Ideas](<https://www.youtube.com/watch?v=isEcgoCmlO0&feature=youtu.be>)**
+* **[The Standard Error](<https://www.youtube.com/watch?v=XNgt7F6FqDU&feature=youtu.be>)**  
+* **[Confidence Intervals](<https://www.youtube.com/watch?v=TqOeMYtOc1w&feature=youtu.be>)**  
+
+
+<br>
+
+## Load Libraries
+
+Before we begin the analysis, let's first load in a few libraries. 
+
+```{r echo=TRUE, results="hide", warning=FALSE, error=FALSE, message=FALSE}
+library(tidyverse)
+library(infer)
+library(scales)
+```
+
+<br>
+
+## Load and View Data
+
+We will utilize the well-known mtcars data set for the upcoming examples.  The only value we are interested in analyzing in this article is the cars' miles-per-gallon **(mpg)**.
+
+```{r}
+mtcars %>% glimpse()
+```
+
+<br>
+
+## Visualize the Distribution of Miles-Per-Gallon (mpg)
+
+The distribution of the 32 original observations is listed below.  
+
+```{r}
+mtcars %>% ggplot(aes(mpg)) +
+  geom_density() +
+  theme_classic()
+```
+
+The **mean** for the individual sample set is **20.09 mpg** and the **standard deviation** is **6.03**.  However, in this article we will concentrate on calculating the distribution of the mean using the bootstrapping method.
+
+<br>
+
+## Part 1: Bootstrapping the Hard Way
+
+As stated previously, we are analyzing the distribution of the means for mpg.  In the code below, we selected the mpg column in the mtcars data set and also added a row number column.  
+
+```{r}
+mtcars_wt_tbl <- mtcars %>%
+  as_tibble() %>%
+  select(mpg) %>%
+  rownames_to_column()
+
+mtcars_wt_tbl
+```
+
+<br>
+
+Listed below are the steps we will take to create a bootstrapping data set from scratch.  As a reminder, there are **32 observations** in the mtcars data set.  
+
+* **Step 1:** Set up a randomized generator that will select any of the 32 observations at random. 
+* **Step 2:** Repeat Step 1 until 32 randomized observations are selected.  It is imperative that duplicate selections are allowed in the randomized selection process.
+* **Step 3:** Once a randomized replicate of 32 is completed, we can repeat Steps 1 and 2 for a total of 1,000 times.  Our unaggregated data set will consist of 32,000 records once these steps are completed.  
+
+*Note: Please note that in some bootstrapping exercises, replicates of 10,000 are often used.*
+
+<br>
+
+#### Steps 1 and 2: Set Up Randomized Generator of 32 Observations (allow duplicates)
+
+```{r}
+set.seed(123)
+
+num_replicates <- 1000
+num_rows       <- mtcars %>% nrow() 
+
+steps_01_02 <- runif((num_replicates*num_rows), min=1, max=num_rows) %>%
+  as_tibble() %>%
+  mutate(value = round(value, 0))
+
+head(steps_01_02, 12)
+```
+
+A total of 32 rows were randomly generated which allowed for duplicate row numbers.  The data above lists the first 12 observations in the data set.  
+
+<br>
+
+#### Step 03: Repeat Steps 1 and 2 for a Total of 1,000 Times
+
+```{r}
+step_03 <- steps_01_02 %>%
+  mutate(replicate = rep(1:num_replicates, each = num_rows)) %>%
+  rename(rowname = value) %>%
+  select(replicate, rowname) %>%
+  mutate(rowname = as.character(rowname))
+  
+random_number_tbl <- step_03
+
+glimpse(random_number_tbl)
+```
+
+As you can see above, we have a total of 32,000 records (32 observations x 1,000 replicates). 
+
+The original data set that included just the mpg for each car can now be joined to the randomized generator tibble.  This will allow us to calculate the mean mpg for each of the 1,000 replicates as well as the 95% confidence interval.
+
+```{r, message=FALSE}
+bootstrap_part_1 <- random_number_tbl %>%
+  left_join(mtcars_wt_tbl)
+
+bootstrap_part_1 %>% glimpse()
+```
+
+<br>
+
+Next, we can calculate the mean mpg and the percentile for each iteration by using a helper function.  We will use this function later on in Part 2.  
+
+```{r, message=FALSE}
+
+aggregate_bootstrap_data <- function(data) {
+  
+  data <- data %>%
+  select(replicate, mpg) %>%
+  group_by(replicate) %>%
+  summarise(mean_mpg = mean(mpg)) %>%
+  ungroup() %>%
+  mutate(percentile_rank = ntile(mean_mpg, 1000)) %>%
+  mutate(percentile_rank = percentile_rank/10)
+  
+}
+
+bootstrap_part_1_agg <- aggregate_bootstrap_data(bootstrap_part_1)
+
+bootstrap_part_1_agg %>% glimpse()
+```
+
+<br>
+
+Using the percentile calculations above, we can easily identify the mean, the lower confidence interval and the upper confidence interval.  For all of the examples, a 95% confidence interval is utilized.
+
+```{r}
+perc_rank_50 <- 50.0
+lower_ci     <- 2.5
+upper_ci     <- 97.5
+
+add_mean_ci_values <- function(data, bootstrap_part) {
+  
+  data <- data %>% 
+    mutate(Group = bootstrap_part) %>%
+
+    # mean
+    mutate(mean_value = case_when(percentile_rank == perc_rank_50 ~ mean_mpg,
+                                TRUE ~ 0)) %>%
+    mutate(mean_value = max(mean_value)) %>%
+
+    # lower confidence interval
+    mutate(lower_ci_value = case_when(percentile_rank == lower_ci ~ mean_mpg,
+                                TRUE ~ 0)) %>%
+    mutate(lower_ci_value = max(lower_ci_value)) %>%
+
+    # upper confidence interval
+    mutate(upper_ci_value = case_when(percentile_rank == upper_ci ~ mean_mpg,
+                                TRUE ~ 0)) %>%
+    mutate(upper_ci_value = max(upper_ci_value))
+  
+}
+
+# Add mean and confience intervals to the data set and label the section we are on.
+bootstrap_part_1_final <- add_mean_ci_values(bootstrap_part_1_agg, "Part_01")
+
+bootstrap_part_1_final %>% glimpse()
+
+```
+
+<br>
+
+We can also graph these results to show the distribution of the bootstrapping results.
+
+```{r}
+
+graph_distribution <- function(data, title) {
+
+ggplot(data, 
+       aes(mean_mpg, fill = Group)) +
+  
+  geom_density(alpha = 0.8,
+               color = "#555759", 
+               fill  = "#D6DBE0") +
+  
+  geom_vline(aes(
+    xintercept = data$lower_ci_value[[1]]),
+    colour = "red",
+    linetype = "dashed") +
+  
+    geom_vline(aes(
+    xintercept = data$upper_ci_value[[1]]),
+    colour = "red",
+    linetype = "dashed") +
+  
+    geom_vline(aes(
+    xintercept = data$mean_value[[1]]),
+    colour = "red",
+    linetype = "solid") +
+  
+  geom_text(aes(data$lower_ci_value[[1]],
+                0, 
+                label = round(data$lower_ci_value[[1]],digits = 2), 
+                hjust = 1)) +
+  geom_text(aes(data$upper_ci_value[[1]],
+                0, 
+                label = round(data$upper_ci_value[[1]],digits = 2), 
+                hjust = 1)) +
+  geom_text(aes(bootstrap_part_1_final$mean_value[[1]],
+                0, 
+                label = round(data$mean_value[[1]],digits = 2), 
+                hjust = 1)) +
+  
+  labs(title    = title,
+       subtitle = "Car MPG Replicate Mean and 95% Confidence Interval") +
+  
+  theme_classic() +
+  
+  theme(axis.text.x  = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.y  = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+}
+
+# Add data and title to function
+graph_distribution(bootstrap_part_1_final, "Bootstrapping Part 1")
+  
+```
+
+To summarize, the mean mpg of all car replicate sets is 20.02 mpg.  Ninety-five (95%) of means of all car replicate sets are between 18.01 and 22.12 mpg.  Any replicate data set that has a mean outside 18.01 and 22.12 mpg is considered an outlier.  
+
+<br>
+
+## Part 2: Bootstrapping the Easy Way
+
+In the example below, we will go through a much easier way of bootstrapping a single column of data using the infer package.  The code in Part 1 that built the randomized table of 32,000 records was approximately 10 lines of code. The code below is only 3 lines. 
+
+```{r}
+set.seed(225)
+
+bootstrap_part_2 <- mtcars_wt_tbl %>%
+  specify(response = mpg) %>%
+  generate(reps = 1000, type = "bootstrap")
+
+glimpse(bootstrap_part_2)
+```
+
+<br>
+
+Next, we calculate each iteration's mean using the helper function we created in Part 1.  
+
+```{r, message = FALSE}
+bootstrap_part_2_agg <- aggregate_bootstrap_data(bootstrap_part_2)
+
+bootstrap_part_2_agg %>% glimpse()
+```
+
+<br>
+
+The helper function below adds the mean and the confidence intervals just as we did in Part 1.
+
+```{r}
+# Add mean and confience intervals to the data set and label the section we are on.
+bootstrap_part_2_final <- add_mean_ci_values(bootstrap_part_2_agg, "Part_02")
+
+bootstrap_part_2_final %>% glimpse()
+```
+
+<br>
+
+Lastly, we can graph and label the new distribution.
+
+```{r}
+
+# Add data and title to function
+graph_distribution(bootstrap_part_2_final, "Bootstrapping Part 2")
+```
+
+To summarize, the mean mpg of all car replicate sets is 20.13 mpg.  Ninety-five (95%) of means of all car replicate sets are between 17.93 and 22.05 mpg.  Any replicate data set that has a mean outside 17.93 and 22.05 mpg is considered an outlier.
+
+<br>
+
+## Summary and Final Thoughts
+Calculating confidence intervals on replicate sets of data is easily performed using bootstrapping methods.  Bootstrapping has been more fully automated with the **[infer](<https://infer-dev.netlify.app/>)** package.  However, as with many statistical methods, it is often a good lesson to perform the math the long way before moving on to easier methods.  
+
+Visualizing confidence intervals on the means of data sets can be a useful way of comparing two different groups of data sets.  They can be a nice addition to a t-test or ANOVA analysis.  
+
+For questions related to this analysis, please message me on **[LinkedIn](<https://www.linkedin.com/in/edorlando07/>)**.  
+
+For access to more of my articles, please check out my **[blog](<https://ed-orlando-07-blog-site.netlify.app/>)**.

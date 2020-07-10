@@ -4,12 +4,52 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/bootstrapping/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/07/07/bootstrapping-confidence-intervals/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/infer/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/r/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r-markdown/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r-studio/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-07-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -19,31 +59,6 @@
   
   <url>
     <loc>/2020/06/24/exploring-expected-values/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/r/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r-markdown/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r-studio/</loc>
-    <lastmod>2020-06-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
     <lastmod>2020-06-24T00:00:00+00:00</lastmod>
   </url>
   
