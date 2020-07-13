@@ -1,5 +1,5 @@
 ---
-title: "Optimizing Multiple Data Sets"
+title: "Non-Linear Programming on Multiple Data Sets"
 author: "Ed Orlando"
 date: 2020-07-11
 categories: ["R"]
@@ -15,33 +15,39 @@ Author: Ed Orlando
 
 ## Introduction & Problem Statement
 
-We have all been there.  We are at the end of a semester in school and the only thing left to do is take that dreaded final exam.  If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade.  Technically, this type of problem is actually an example of an optimization problem that one can solve manually using basic algebra. 
+We have all been there.  We are at the end of a semester in school and the only thing left to do is take that dreaded final exam.  If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade.
 
-In this article, we will solve this very straightforward optimization problem programmatically using R's **[ROI package](<https://cran.r-project.org/web/packages/ROI.plugin.alabama/ROI.plugin.alabama.pdf>)**.  In the first example, we will find the minimum grade needed on the final exam in order to receive a **B** in our **History** class.  We will assume an **80%** gets us a B for all of our courses.
+In this article, we will solve this very straightforward optimization problem programmatically using R's **[ROI package](<https://cran.r-project.org/web/packages/ROI.plugin.alabama/ROI.plugin.alabama.pdf>)**.  In the first example, we will find the minimum grade needed on the final exam in order to receive a **B** in our **History** class.  
 
 In the second example, we will find the minimum final exam grade needed to receive a **B (80%)** for all four of our courses: **History, Science, Math, & English**.  In other words, this article will show you how to solve similarly structured optimization problems with various data sets all in one function.  
 
 ## Linear v Non-Linear Solvers
 
-Although the problems presented in this article are technically linear optimization problems, we are going to solve them using **customized functions** and **non-linear solvers**.  The benefit of this approach is that it offers the most flexibility to optimization problems one faces in the wild.  Although linear solver solutions are easier to set up, understand, and solve for the global optimal, non-linear problem set ups and solutions allow for conditions (if-then statements) that are not allowed in linear solver solutions.  Usually in business problems, conditional statements are common.  Therefore, the solutions presented below concentrate solely on setting up customized functions and non-linear solver solutions.  
+Although the problems presented in this article are technically linear optimization problems, we are going to solve them using **customized functions** and **non-linear solvers**.  The benefit of this approach is that it offers the most flexibility to optimization problems one faces in the wild.  
+
+Although linear solver solutions are easier to set up, understand, and solve for the global optimal, non-linear problem set ups and solutions allow for conditions (if-then statements) that are not allowed in linear solver solutions.  
+
+Conditional statements are common in many business-type optimization problems.  Therefore, the solutions presented below concentrate solely on setting up customized functions and non-linear solver solutions.  
 
 ## R Versus Excel
 
-Although it is also feasible to set up 4 similarly structured optimization problems and solve each one independently in Excel, it might not be feasible or efficient to solve 100 similarly structured optimization problems without a more powerful engine.  If you were an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get **bogged down** and retrieving all the output information might become **tedious** and **error prone**.  
+Although it is also feasible to set up 4 similarly structured optimization problems and solve each one independently in Excel, it might not be feasible or efficient to solve 100 similarly structured optimization problems without a more powerful engine.  
 
-In addition, although Excel's linear solver solutions are very accurate compared to other software, Excel's non-linear programming solutions often do not find the global optimal and can be off by as much as **10-20%** compared other software.
+If you are an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get **bogged down** and retrieving all the output information might become **tedious** and **error prone**.  
+
+In addition, although Excel's linear solver solutions are very accurate compared to other software, Excel's non-linear programming solutions often do not find the global optimal and **can be off** by as much as **10-20%** compared other software.
 
 ## ROI Package versus OMPR Package
 
-There is an **[ompr](<https://cran.r-project.org/web/packages/ompr/ompr.pdf>)** package in R that allows for tidy linear programming and is simple to use.  However, as this time, the ompr package does not support non-linear functions.  
+There is an **[ompr](<https://cran.r-project.org/web/packages/ompr/ompr.pdf>)** package in R that allows for tidy linear programming and is simple to use.  However, at this time, the ompr package does not support non-linear functions.  
 
-Although the ROI package has a steeper learning curve, once you get comfortable with it, you can set up non-linear functions very easily and it provides the most flexibility for most optimization problems.  In fact, the problems we are solving in the article are technically linear optimization problems.  Nevertheless, as mentioned earlier, we will solve all the problems non-linearly using customized functions in order to display the benefits of this approach.
+Although the ROI package has a steeper learning curve, once you get comfortable with it, you can set up non-linear functions very easily and it provides the most flexibility for most optimization problems.  As stated earlier, the problems we are solving in the article are technically linear optimization problems and we do run the risk of possible not finding the global optimal.  Nevertheless, as mentioned earlier, we will solve all the problems non-linearly using customized functions in order to display the benefits of this approach.
 
 <br>
 
 ## Gratitude & References
 
-If you want more detailed information about the topics discussed in this article, please check out Matt Dancho's **[Learning Labs Pro: 15 & 16](<https://university.business-science.io/p/learning-labs-pro>)**.  If you are not a Learning Lab Pro member and you love R, you should definitely subscribe.  As a disclaimer, I have no affiliation with BSU, I am just an avid student and huge fan.   
+If you want more detailed information about the topics discussed in this article, please check out Matt Dancho's **[Learning Labs Pro: 15 & 16](<https://university.business-science.io/p/learning-labs-pro>)**.  If you are not a Learning Lab Pro member and you love R or data science, you should definitely subscribe.  As a disclaimer, I have no affiliation with BSU, I am just an avid student and huge fan.   
 
 <br>
 
@@ -297,12 +303,12 @@ receive_all_Bs_summary_tbl <- all_subjects_current_grade_nested_tbl %>%
 glimpse(receive_all_Bs_summary_tbl)
 ```
 
-In summary, we would need to get the following minimum final exam scores in order to get all Bs on our report card for all four subjects.  
+In summary, we would need to get the following minimum final exam scores in order to get all **Bs** on our report card for all four subjects.  
 
-* History Final Exam ~ 70%  
-* Science Final Exam ~ 73%
-* Math Final Exam ~ 84%
-* English Final Exam ~ 92%
+* History Final Exam Score ~ 70%  
+* Science Final Exam Score ~ 73%
+* Math Final Exam Score ~ 84%
+* English Final Exam Score ~ 92%
 
 <br>
 
@@ -323,12 +329,12 @@ glimpse(receive_all_As_summary_tbl)
 
 In summary, we would need to get the following minimum final exam scores in order to get all **As** on our report card for all four subjects.  
 
-* History Final Exam ~ 90%  
-* Science Final Exam ~ 93%
-* Math Final Exam ~ 104%
-* English Final Exam ~ 112%
+* History Final Exam Score ~ 90%  
+* Science Final Exam Score ~ 93%
+* Math Final Exam Score ~ 104%
+* English Final Exam Score ~ 112%
 
-Unfortunately, unless extra credit was given on the Math and English exams, we could not get an A in either class, since we would have to score above 100% for each final exam.  However, As in History and Science are achievable if we scored a 90% and a 93% on those finals, respectively.
+Unfortunately, unless extra credit was given on the Math and English exams, we could not get an A in either class, since we would have to score above 100% for each final exam.  However, **As** in History and Science are achievable if we scored a 90% and a 93% on those finals, respectively.
 
 ## Summary and Final Thoughts
 
