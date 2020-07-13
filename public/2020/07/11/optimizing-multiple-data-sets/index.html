@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.72.0" />
+
+
+<title>Optimizing Multiple Data Sets - A Hugo website</title>
+<meta property="og:title" content="Optimizing Multiple Data Sets - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="75"
+         height="75"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="https://ed-orlando07-home.netlify.app/">@Home</a></li>
+    
+    <li><a href="/">Blog</a></li>
+    
+    <li><a href="https://ed-orlando-07-blog-site.netlify.app/pdfs/CV_Orlando.pdf">CV</a></li>
+    
+    <li><a href="https://github.com/edorlando07/blog_site">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">14 min read</span>
+    
+
+    <h1 class="article-title">Optimizing Multiple Data Sets</h1>
+
+    
+    <span class="article-date">2020-07-11</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Author: Ed Orlando</p>
+<div id="introduction-problem-statement" class="section level2">
+<h2>Introduction &amp; Problem Statement</h2>
+<p>We have all been there. We are at the end of a semester in school and the only thing left to do is take that dreaded final exam. If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade. Technically, this type of problem is actually an example of an optimization problem that one can solve manually using basic algebra.</p>
+<p>In this article, we will solve this very straightforward optimization problem programmatically using R’s <strong><a href="https://cran.r-project.org/web/packages/ROI.plugin.alabama/ROI.plugin.alabama.pdf">ROI package</a></strong>. In the first example, we will find the minimum grade needed on the final exam in order to receive a <strong>B</strong> in our <strong>History</strong> class. We will assume an <strong>80%</strong> gets us a B for all of our courses.</p>
+<p>In the second example, we will find the minimum final exam grade needed to receive a <strong>B (80%)</strong> for all four of our courses: <strong>History, Science, Math, &amp; English</strong>. In other words, this article will show you how to solve similarly structured optimization problems with various data sets all in one function.</p>
+</div>
+<div id="linear-v-non-linear-solvers" class="section level2">
+<h2>Linear v Non-Linear Solvers</h2>
+<p>Although the problems presented in this article are technically linear optimization problems, we are going to solve them using <strong>customized functions</strong> and <strong>non-linear solvers</strong>. The benefit of this approach is that it offers the most flexibility to optimization problems one faces in the wild. Although linear solver solutions are easier to set up, understand, and solve for the global optimal, non-linear problem set ups and solutions allow for conditions (if-then statements) that are not allowed in linear solver solutions. Usually in business problems, conditional statements are common. Therefore, the solutions presented below concentrate solely on setting up customized functions and non-linear solver solutions.</p>
+</div>
+<div id="r-versus-excel" class="section level2">
+<h2>R Versus Excel</h2>
+<p>Although it is also feasible to set up 4 similarly structured optimization problems and solve each one independently in Excel, it might not be feasible or efficient to solve 100 similarly structured optimization problems without a more powerful engine. If you were an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get <strong>bogged down</strong> and retrieving all the output information might become <strong>tedious</strong> and <strong>error prone</strong>.</p>
+<p>In addition, although Excel’s linear solver solutions are very accurate compared to other software, Excel’s non-linear programming solutions often do not find the global optimal and can be off by as much as <strong>10-20%</strong> compared other software.</p>
+</div>
+<div id="roi-package-versus-ompr-package" class="section level2">
+<h2>ROI Package versus OMPR Package</h2>
+<p>There is an <strong><a href="https://cran.r-project.org/web/packages/ompr/ompr.pdf">ompr</a></strong> package in R that allows for tidy linear programming and is simple to use. However, as this time, the ompr package does not support non-linear functions.</p>
+<p>Although the ROI package has a steeper learning curve, once you get comfortable with it, you can set up non-linear functions very easily and it provides the most flexibility for most optimization problems. In fact, the problems we are solving in the article are technically linear optimization problems. Nevertheless, as mentioned earlier, we will solve all the problems non-linearly using customized functions in order to display the benefits of this approach.</p>
+<p><br></p>
+</div>
+<div id="gratitude-references" class="section level2">
+<h2>Gratitude &amp; References</h2>
+<p>If you want more detailed information about the topics discussed in this article, please check out Matt Dancho’s <strong><a href="https://university.business-science.io/p/learning-labs-pro">Learning Labs Pro: 15 &amp; 16</a></strong>. If you are not a Learning Lab Pro member and you love R, you should definitely subscribe. As a disclaimer, I have no affiliation with BSU, I am just an avid student and huge fan.</p>
+<p><br></p>
+</div>
+<div id="load-libraries" class="section level2">
+<h2>Load Libraries</h2>
+<p>Before we begin the analysis, let’s first load in a few libraries - including the <strong><a href="https://cran.r-project.org/web/packages/ROI.plugin.alabama/ROI.plugin.alabama.pdf">ROI.plugin.alabama package</a></strong>.</p>
+<pre class="r"><code># Solver Backend
+library(ROI)
+library(ROI.plugin.alabama)
+
+# Core
+library(tidyverse)</code></pre>
+<hr>
+</div>
+<div id="part-1-section-1-calculate-minimum-final-exam-score-for-history-class" class="section level2">
+<h2>Part 1 | Section 1: Calculate Minimum Final Exam Score for History Class</h2>
+<p>Remember, our goal is to find the lowest final exam score needed in order to get an overall B grade (80%). Our overall grade in the class is currently 90%, and we have not taken the final exam. The assignments are worth 50% of the grading weight and the final exam is also 50% of the grading weight.</p>
+<p>The current grades and summary stats are below:</p>
+<ul>
+<li>Assignment #1: 12 pnts out of 15 ~ 80%<br />
+</li>
+<li>Assignment #2: 20 pnts out of 20 ~ 100%<br />
+</li>
+<li>Assignment #3: 13 pnts out of 15 ~ 87%<br />
+
+<hr></li>
+<li><strong>Current Grade Summary: 45 points out of 50 ~ 90%</strong>
+<hr></li>
+<li><strong>Final Exam: unknown score out of 50 pnts</strong>
+<hr></li>
+</ul>
+<p>Without using a calculator, we know that the minimum score needed on the final exam to receive a B (80% overall) is <strong>70%</strong>. We can prove it out below.</p>
+<p>(<strong>90%</strong> assignment total score x <strong>0.50</strong> wt) + (<strong>70%</strong> final exam score x <strong>0.50</strong> wt) = <strong>80%</strong> overall grade ~ <strong>B</strong></p>
+<p><br></p>
+</div>
+<div id="part-1-section-2-set-up-history-scores-in-a-tibble" class="section level2">
+<h2>Part 1 | Section 2: Set Up History Scores in a Tibble</h2>
+<p>We will set up a data tibble for our current History course scores for the first 3 assignments.</p>
+<pre class="r"><code>history_current_grade_tbl &lt;- tibble(
+  Subject       = rep(c(&quot;History&quot;), times = c(3)),
+  Assignment    = c(&quot;Assign_01&quot;, &quot;Assign_02&quot;, &quot;Assign_03&quot;),
+  Pnts_Earned   = c(12.00, 20.00, 13.00),
+  Pnts_Possible = c(15.00, 20.00, 15.00))
+
+history_current_grade_tbl</code></pre>
+<pre><code>## # A tibble: 3 x 4
+##   Subject Assignment Pnts_Earned Pnts_Possible
+##   &lt;chr&gt;   &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt;
+## 1 History Assign_01           12            15
+## 2 History Assign_02           20            20
+## 3 History Assign_03           13            15</code></pre>
+<p>We also know that the final exam is worth 50 points. We will set up a variable below and use it later in our customized function.</p>
+<pre class="r"><code>Pnts_Possible_Final_Exam &lt;- 50</code></pre>
+<p><br></p>
+</div>
+<div id="part-1-section-3-set-up-function-to-calculate-points-needed" class="section level2">
+<h2>Part 1 | Section 3: Set Up Function to Calculate Points Needed</h2>
+<p>Next, we will set up a customized function that will allow us to pass through an anonymous value for the points earned on the Final Exam. Once a value is plugged into the function, it will calculate the final grade. Remember, the final exam score needed to achieve our goal is <strong>“technically unknown” to this function</strong>, but we will test it out manually before plugging it into the non-linear solver.</p>
+<pre class="r"><code>calc_Final_Exam_Points &lt;- function(Pnts_Earned_Final_Exam) {
+  history_current_grade_tbl %&gt;%
+    # Sum up current points earned and sum up all current possible points
+    summarise(Pnts_Earned_sum   = sum(Pnts_Earned),
+              Pnts_Possible_sum = sum(Pnts_Possible)) %&gt;%
+    # Add Unknown Final Exam Pnts Earned to Current Pnts Earned
+    mutate(Total_Pnts_Earned = Pnts_Earned_Final_Exam + Pnts_Earned_sum) %&gt;%
+    # Add Final Exam Possible Possible Pnts to Current Possible Pnts
+    mutate(Total_Pnts_Possible = Pnts_Possible_Final_Exam + Pnts_Possible_sum) %&gt;%
+    # Calculate Total Grade for Class
+    mutate(Final_Class_Grade = Total_Pnts_Earned/Total_Pnts_Possible) %&gt;%
+    # Pull out Final Class Grade
+    pull(Final_Class_Grade)
+}</code></pre>
+<p>When we plug in <strong>35 final exam pnts earned</strong>, the final grade that is calculated equals <strong>80%</strong>. In other words, we would need a <strong>70% on the final</strong> (35 pnts earned / 50 pnts possible) to get an overall score of 80%. Therefore, we know the function is working properly.</p>
+<pre class="r"><code>calc_Final_Exam_Points(35)</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<p><br></p>
+</div>
+<div id="part-1-section-4-set-up-a-single-data-set-optimization-objective" class="section level2">
+<h2>Part 1 | Section 4: Set Up a Single Data Set Optimization Objective</h2>
+<p>We still have not techically solved this problem using a solver solution. Therefore, let’s assume we didn’t know the answer and we needed to <strong>solve programmatically</strong>. The number of outputs we will receive from the solver function equals one (1), so we will set our n variable = 1. We also know we want to achieve an 80% overall grade, so we can set that variable up as well.</p>
+<pre class="r"><code>n &lt;- 1
+final_grade &lt;- 0.80</code></pre>
+<p>Next, we will create a function that is described in detail below.</p>
+<ul>
+<li>A single data set will be allowed to pass through the function. In this example, the data set is the history_current_grade_tbl which includes all of our History course scores to date.<br />
+</li>
+<li>The objective is to calculate the Final Exam points needed to achieve a B (80% overall grade).</li>
+<li>The only constraint in the solver set is that the final grade must be equal to 80%.<br />
+</li>
+<li>Since this is a minimization problem, we set maximum = FALSE<br />
+</li>
+<li>Lastly, we can then solve the problem using the ROI_solve function and the alabama solver to return the results in a well formatted tibble using some dplyr functions.</li>
+</ul>
+<pre class="r"><code>single_data_set_optimization &lt;- function(data = data) {
+
+  final_exam_grade_nlp &lt;- OP(
+    objective   = F_objective(F = calc_Final_Exam_Points, n = n, names = &quot;Pnts_Earned_Final_Exam&quot;),
+    constraints = rbind(
+      F_constraint(F = calc_Final_Exam_Points, dir = &quot;==&quot;, rhs = final_grade)
+    ),
+    maximum = FALSE
+  )
+  
+  sol &lt;- ROI_solve(final_exam_grade_nlp, solver = &quot;alabama&quot;, start = rep(1/n, n))
+  
+  return(
+    bind_cols(
+      tibble(Final_Grade_Perc  = calc_Final_Exam_Points(sol$solution)),
+      enframe(sol$solution) %&gt;% spread(key = name, value = value),
+      tibble(Pnts_Possible_Final_Exam = Pnts_Possible_Final_Exam)) %&gt;%
+      
+      mutate(Final_Exam_Score_Needed = Pnts_Earned_Final_Exam/Pnts_Possible_Final_Exam)
+    
+  )
+}</code></pre>
+<p>Now we can pass the grade tibble into the function and view the results.</p>
+<pre class="r"><code>history_grade_summary &lt;- single_data_set_optimization(history_current_grade_tbl)
+
+glimpse(history_grade_summary)</code></pre>
+<pre><code>## Rows: 1
+## Columns: 4
+## $ Final_Grade_Perc         &lt;dbl&gt; 0.8
+## $ Pnts_Earned_Final_Exam   &lt;dbl&gt; 35
+## $ Pnts_Possible_Final_Exam &lt;dbl&gt; 50
+## $ Final_Exam_Score_Needed  &lt;dbl&gt; 0.7</code></pre>
+<p>The formatted tibble returns the appropriate results we expected when calculating the solution manually. In order to receive a minimum of <strong>overall grade of 80%</strong>, we would need to score a <strong>70% on the final exam</strong>. The set up of these functions will now allow us to programmatically figure out what we need to score on all of our final exams in order to get Bs in all of our classes.</p>
+<hr>
+</div>
+<div id="part-2-section-1-calculate-minimum-final-exam-score-for-all-classes" class="section level2">
+<h2>Part 2 | Section 1: Calculate Minimum Final Exam Score for All Classes</h2>
+<p>In Part 2, we will now explore how to calculate the minimum final exam scores needed to get Bs in all four courses: <em>History, Science, Math &amp; English</em>. A summary of our current grades to date are listed below.</p>
+<p>To keep the examples simple, we assume there has only been 3 assignments in each of the 4 classes, and all four final exams are worth 50 points.</p>
+<ul>
+<li>History Current Grade: 90% (45.0 pnts out of 50)<br />
+</li>
+<li>Science Current Grade: 87% (43.5 pnts out of 50)</li>
+<li>Math Current Grade: 76% (38.0 pnts out of 50)<br />
+</li>
+<li>English Current Grade: 68% (34.0 pnts out of 50)</li>
+</ul>
+<p><br></p>
+</div>
+<div id="part-2-section-2-set-up-all-subjects-scores-in-a-tibble" class="section level2">
+<h2>Part 2 | Section 2: Set Up All Subjects’ Scores in a Tibble</h2>
+<p>We will set up a data tibble for our all current scores for the first 3 assignments for all 4 subjects.</p>
+<pre class="r"><code>all_subjects_current_grade_tbl &lt;- tibble(
+  Subject       = rep(c(&quot;History&quot;, &quot;Science&quot;, &quot;Math&quot;, &quot;English&quot;), times = c(3, 3, 3, 3)),
+  Assignment    = rep(c(&quot;Assign_01&quot;, &quot;Assign_02&quot;, &quot;Assign_03&quot;), times = c(4)),
+  Pnts_Earned   = c(12, 20, 13, 12, 20, 11.5, 10, 18, 10, 10, 14, 10),
+  Pnts_Possible = c(15, 20, 15, 15, 20, 15, 15, 20, 15, 15, 20, 15))
+
+all_subjects_current_grade_tbl</code></pre>
+<pre><code>## # A tibble: 12 x 4
+##    Subject Assignment Pnts_Earned Pnts_Possible
+##    &lt;chr&gt;   &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt;
+##  1 History Assign_01         12              15
+##  2 History Assign_02         20              20
+##  3 History Assign_03         13              15
+##  4 Science Assign_01         12              15
+##  5 Science Assign_02         20              20
+##  6 Science Assign_03         11.5            15
+##  7 Math    Assign_01         10              15
+##  8 Math    Assign_02         18              20
+##  9 Math    Assign_03         10              15
+## 10 English Assign_01         10              15
+## 11 English Assign_02         14              20
+## 12 English Assign_03         10              15</code></pre>
+<p><br></p>
+</div>
+<div id="part-2-section-3-set-up-nested-tibble" class="section level2">
+<h2>Part 2 | Section 3: Set Up Nested Tibble</h2>
+<p>One incredible functionality in R is the ability to nest() data that allows you to apply functions across multiple data sets independently. To describe it differently, if we scored really well on our Math final, it would not affect our Science grade at all. To account for the various independent data sets, we set up a nested tibble which includes the same information in the tibble above.</p>
+<pre class="r"><code>all_subjects_current_grade_nested_tbl &lt;- all_subjects_current_grade_tbl %&gt;%
+  group_by(Subject) %&gt;%
+  nest()
+
+all_subjects_current_grade_nested_tbl</code></pre>
+<pre><code>## # A tibble: 4 x 2
+## # Groups:   Subject [4]
+##   Subject data            
+##   &lt;chr&gt;   &lt;list&gt;          
+## 1 History &lt;tibble [3 x 3]&gt;
+## 2 Science &lt;tibble [3 x 3]&gt;
+## 3 Math    &lt;tibble [3 x 3]&gt;
+## 4 English &lt;tibble [3 x 3]&gt;</code></pre>
+<p>We will apply the optimization function we created in Part 1 to the nested data that will allow us to calculate an optimal score for <strong>all four final exams independently</strong>. Think of this as a loop that will calculate the History optimal score, print some results, and then go on to the other subjects and do the same until all four scores are calculated.</p>
+<p>For more information about nested functions and mapping, please check out <strong><a href="https://r4ds.had.co.nz/many-models.html">R for Data Science</a></strong>.</p>
+<p><br></p>
+</div>
+<div id="part-2-section-4-set-up-a-multiple-data-set-optimization-objective" class="section level2">
+<h2>Part 2 | Section 4: Set Up a Multiple Data Set Optimization Objective</h2>
+<p>As we did earlier, we will set n = 1 since we are only receiving one (1) output score for each subject. We also know we want to achieve an 80% overall grade for all subjects, so we can set that variable up as well.</p>
+<pre class="r"><code>n &lt;- 1
+final_grade &lt;- 0.80</code></pre>
+<p>The only difference in the code below is that we wrap another function around our original calc_Final_Exam_Points() function to allow for the mapping across multiple data sets.</p>
+<pre class="r"><code>all_subjects_nested_model &lt;- function(nested_tbl) {
+  
+  calc_Final_Exam_Points &lt;- function(Pnts_Earned_Final_Exam) {
+    
+    nested_tbl %&gt;%
+      # Sum up current points earned and sum up all current possible points
+      summarise(Pnts_Earned_sum = sum(Pnts_Earned),
+                Pnts_Possible_sum = sum(Pnts_Possible)) %&gt;%
+      # Add Unknown Final Exam Pnts Earned to Current Pnts Earned
+      mutate(Total_Pnts_Earned = Pnts_Earned_Final_Exam + Pnts_Earned_sum) %&gt;%
+      # Add Final Exam Possible Possible Pnts to Current Possible Pnts
+      mutate(Total_Pnts_Possible = Pnts_Possible_Final_Exam + Pnts_Possible_sum) %&gt;%
+      # Calculate Total Grade for Class
+      mutate(Final_Class_Grade = Total_Pnts_Earned/Total_Pnts_Possible) %&gt;% 
+      # Pull out Final Class Grade
+      pull(Final_Class_Grade)
+  }
+  
+  final_exam_grade_nlp &lt;- OP(
+    objective   = F_objective(F = calc_Final_Exam_Points, n = n, names = &quot;Pnts_Earned_Final_Exam&quot;),
+    constraints = rbind(
+      F_constraint(F = calc_Final_Exam_Points, dir = &quot;==&quot;, rhs = final_grade)
+    ),
+    maximum = FALSE
+  )
+  
+  sol &lt;- ROI_solve(final_exam_grade_nlp, solver = &quot;alabama&quot;, start = rep(1/n, n))
+  
+  return(
+    bind_cols(
+      tibble(Final_Grade_Perc  = calc_Final_Exam_Points(sol$solution)),
+      enframe(sol$solution) %&gt;% spread(key = name, value = value),
+      tibble(Pnts_Possible_Final_Exam = Pnts_Possible_Final_Exam)) %&gt;%
+      
+      mutate(Final_Exam_Score_Needed = Pnts_Earned_Final_Exam/Pnts_Possible_Final_Exam)
+  )
+}</code></pre>
+<p>Now all we have to do is map the all_subjects_nested_model() function to the nested data set and unnest() the results. The final results are listed below in a nice tidy format.</p>
+<pre class="r"><code>receive_all_Bs_summary_tbl &lt;- all_subjects_current_grade_nested_tbl %&gt;% 
+  mutate(model = map(data, all_subjects_nested_model)) %&gt;%
+  select(Subject, model) %&gt;%
+  unnest()</code></pre>
+<pre><code>## Warning: `cols` is now required when using unnest().
+## Please use `cols = c(model)`</code></pre>
+<pre class="r"><code>glimpse(receive_all_Bs_summary_tbl)</code></pre>
+<pre><code>## Rows: 4
+## Columns: 5
+## Groups: Subject [4]
+## $ Subject                  &lt;chr&gt; &quot;History&quot;, &quot;Science&quot;, &quot;Math&quot;, &quot;English&quot;
+## $ Final_Grade_Perc         &lt;dbl&gt; 0.8, 0.8, 0.8, 0.8
+## $ Pnts_Earned_Final_Exam   &lt;dbl&gt; 35.0, 36.5, 42.0, 46.0
+## $ Pnts_Possible_Final_Exam &lt;dbl&gt; 50, 50, 50, 50
+## $ Final_Exam_Score_Needed  &lt;dbl&gt; 0.70, 0.73, 0.84, 0.92</code></pre>
+<p>In summary, we would need to get the following minimum final exam scores in order to get all Bs on our report card for all four subjects.</p>
+<ul>
+<li>History Final Exam ~ 70%<br />
+</li>
+<li>Science Final Exam ~ 73%</li>
+<li>Math Final Exam ~ 84%</li>
+<li>English Final Exam ~ 92%</li>
+</ul>
+<p><br></p>
+</div>
+<div id="part-2-section-5-calculate-score-needed-to-get-all-as" class="section level2">
+<h2>Part 2 | Section 5: Calculate Score Needed to Get All As</h2>
+<p>Since we created dynamic functions and variables, we can also see if it is feasible to get a 90% or an A in every course by changing the final_grade variable to 0.90. And then all we need to do is re-run the same function and print the results.</p>
+<pre class="r"><code>final_grade &lt;- 0.90
+
+receive_all_As_summary_tbl &lt;- all_subjects_current_grade_nested_tbl %&gt;% 
+  mutate(model = map(data, all_subjects_nested_model)) %&gt;%
+  select(Subject, model) %&gt;%
+  unnest()</code></pre>
+<pre><code>## Warning: `cols` is now required when using unnest().
+## Please use `cols = c(model)`</code></pre>
+<pre class="r"><code>glimpse(receive_all_As_summary_tbl)</code></pre>
+<pre><code>## Rows: 4
+## Columns: 5
+## Groups: Subject [4]
+## $ Subject                  &lt;chr&gt; &quot;History&quot;, &quot;Science&quot;, &quot;Math&quot;, &quot;English&quot;
+## $ Final_Grade_Perc         &lt;dbl&gt; 0.9, 0.9, 0.9, 0.9
+## $ Pnts_Earned_Final_Exam   &lt;dbl&gt; 45.0, 46.5, 52.0, 56.0
+## $ Pnts_Possible_Final_Exam &lt;dbl&gt; 50, 50, 50, 50
+## $ Final_Exam_Score_Needed  &lt;dbl&gt; 0.90, 0.93, 1.04, 1.12</code></pre>
+<p>In summary, we would need to get the following minimum final exam scores in order to get all <strong>As</strong> on our report card for all four subjects.</p>
+<ul>
+<li>History Final Exam ~ 90%<br />
+</li>
+<li>Science Final Exam ~ 93%</li>
+<li>Math Final Exam ~ 104%</li>
+<li>English Final Exam ~ 112%</li>
+</ul>
+<p>Unfortunately, unless extra credit was given on the Math and English exams, we could not get an A in either class, since we would have to score above 100% for each final exam. However, As in History and Science are achievable if we scored a 90% and a 93% on those finals, respectively.</p>
+</div>
+<div id="summary-and-final-thoughts" class="section level2">
+<h2>Summary and Final Thoughts</h2>
+<p>The examples presented are not especially difficult to solve manually or by using Excel’s solver since both problems presented are technically linear and very simple in nature. Linear problems are often easier to understand compared to non-linear.</p>
+<p>However, I personally believe in this non-linear and functional setup approach since I think non-linear problems are more likely presented in the wild. Non-linear problems allow for conditions (if-then statements) to be set up in the functions that also adds another layer of flexibility to the optimization solutions.</p>
+<p>Although the functions and the setup may seem like a lot to absorb, I truly believe the power comes from the ability to pass multiple data sets through one function multiple times to get multiple solutions. I hope you found some value in this article.</p>
+<p>For questions related to this analysis, please message me on <strong><a href="https://www.linkedin.com/in/edorlando07/">LinkedIn</a></strong>.</p>
+<p>For access to more of my articles, please check out my <strong><a href="https://ed-orlando-07-blog-site.netlify.app/">blog</a></strong>.</p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

@@ -6,10 +6,20 @@
     <description>Recent content in R on A Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 11 Jul 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Optimizing Multiple Data Sets</title>
+      <link>/2020/07/11/optimizing-multiple-data-sets/</link>
+      <pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/07/11/optimizing-multiple-data-sets/</guid>
+      <description>Author: Ed Orlando
+Introduction &amp;amp; Problem StatementWe have all been there. We are at the end of a semester in school and the only thing left to do is take that dreaded final exam. If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade. Technically, this type of problem is actually an example of an optimization problem that one can solve manually using basic algebra.</description>
+    </item>
     
     <item>
       <title>Bootstrapping Confidence Intervals</title>
