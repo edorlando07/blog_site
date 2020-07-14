@@ -12,14 +12,13 @@
     
     
     <item>
-      <title>Non-Linear Programming on Multiple Data Sets</title>
-      <link>/2020/07/11/non-linear-programming-on-multiple-data-sets/</link>
+      <title>Non-Linear Programming: A Multiple Data Set Approach</title>
+      <link>/2020/07/11/non-linear-programming-a-multiple-data-set-approach/</link>
       <pubDate>Sat, 11 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2020/07/11/non-linear-programming-on-multiple-data-sets/</guid>
+      <guid>/2020/07/11/non-linear-programming-a-multiple-data-set-approach/</guid>
       <description>Author: Ed Orlando
-Introduction &amp;amp; Problem StatementWe have all been there. We are at the end of a semester in school and the only thing left to do is take that dreaded final exam. If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade.
-In this article, we will solve this very straightforward optimization problem programmatically using R’s ROI package.</description>
+Introduction &amp;amp; Problem StatementWe have all been there. You are at the end of the school semester and the only thing left to do is take that dreaded final exam. If you were like me, you would calculate the minimum exam score needed to receive a certain grade. For example, you might be able to score a 70% on your History exam and still get a B in the class.</description>
     </item>
     
   </channel>

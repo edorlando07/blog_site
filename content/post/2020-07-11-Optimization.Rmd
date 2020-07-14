@@ -1,5 +1,5 @@
 ---
-title: "Non-Linear Programming on Multiple Data Sets"
+title: "Non-Linear Programming: A Multiple Data Set Approach"
 author: "Ed Orlando"
 date: 2020-07-11
 categories: ["R"]
@@ -15,19 +15,19 @@ Author: Ed Orlando
 
 ## Introduction & Problem Statement
 
-We have all been there.  We are at the end of a semester in school and the only thing left to do is take that dreaded final exam.  If you were like me, you wanted to know what minimum score you needed on the final exam to get a certain overall grade.
+We have all been there.  You are at the end of the school semester and the only thing left to do is take that dreaded final exam.  If you were like me, you would calculate the minimum exam score needed to receive a certain grade.  For example, you might be able to score a 70% on your History exam and still get a B in the class.  This is valuable information since you might decide to spend more time studying for other exams if you think a 70% is easily achievable.
 
 In this article, we will solve this very straightforward optimization problem programmatically using R's **[ROI package](<https://cran.r-project.org/web/packages/ROI.plugin.alabama/ROI.plugin.alabama.pdf>)**.  In the first example, we will find the minimum grade needed on the final exam in order to receive a **B** in our **History** class.  
 
-In the second example, we will find the minimum final exam grade needed to receive a **B (80%)** for all four of our courses: **History, Science, Math, & English**.  In other words, this article will show you how to solve similarly structured optimization problems with various data sets all in one function.  
+In the second example, we will find the minimum final exam grade needed to receive a **B (80%)** for all four of our classes: **History, Science, Math, & English**.  The goal of this article is to show you how to solve similarly structured optimization problems with various data sets all in one function.  
 
 ## Linear v Non-Linear Solvers
 
 Although the problems presented in this article are technically linear optimization problems, we are going to solve them using **customized functions** and **non-linear solvers**.  The benefit of this approach is that it offers the most flexibility to optimization problems one faces in the wild.  
 
-Although linear solver solutions are easier to set up, understand, and solve for the global optimal, non-linear problem set ups and solutions allow for conditions (if-then statements) that are not allowed in linear solver solutions.  
+Linear solver solutions are fairly easy to set up and understand. Linear solvers also find the global optimal solution without the risk of finding only local optimal solutions.  However, non-linear problem set ups and solutions allow for conditionals (if-then statements) that are not allowed in linear solver solutions.  
 
-Conditional statements are common in many business-type optimization problems.  Therefore, the solutions presented below concentrate solely on setting up customized functions and non-linear solver solutions.  
+Conditional statements are very common in many business-type optimization problems.  Therefore, the solutions presented below concentrate solely on setting up customized functions and **non-linear solver solutions** that offer the most flexibility.  
 
 ## R Versus Excel
 
@@ -35,19 +35,23 @@ Although it is also feasible to set up 4 similarly structured optimization probl
 
 If you are an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get **bogged down** and retrieving all the output information might become **tedious** and **error prone**.  
 
-In addition, although Excel's linear solver solutions are very accurate compared to other software, Excel's non-linear programming solutions often do not find the global optimal and **can be off** by as much as **10-20%** compared other software.
+In addition, although Excel's linear solver solutions are very accurate compared to other software, Excel's non-linear programming solutions often do not find the global optimal.  Excel's non-linear solutions are sometimes 10-20% less optimal compared to more mature solvers.
+
+To summarise, it may take longer to set up the non-linear code in R, but you will be able to loop through multiple sets easier and get faster and more optimal results.
 
 ## ROI Package versus OMPR Package
 
-There is an **[ompr](<https://cran.r-project.org/web/packages/ompr/ompr.pdf>)** package in R that allows for tidy linear programming and is simple to use.  However, at this time, the ompr package does not support non-linear functions.  
+There is an **[ompr](<https://cran.r-project.org/web/packages/ompr/ompr.pdf>)** package in R that allows for tidy linear programming and is simple to use.  However, at this time, the ompr package **does not support non-linear functions**.  
 
-Although the ROI package has a steeper learning curve, once you get comfortable with it, you can set up non-linear functions very easily and it provides the most flexibility for most optimization problems.  As stated earlier, the problems we are solving in the article are technically linear optimization problems and we do run the risk of possible not finding the global optimal.  Nevertheless, as mentioned earlier, we will solve all the problems non-linearly using customized functions in order to display the benefits of this approach.
+Although the ROI package has a steeper learning curve, once you get comfortable with it, you can set up non-linear functions very easily.  The ROI package also provides a great deal of flexibility for most business related optimization problems.  
+
+As stated earlier, the problems we are solving in the article are technically linear in nature and we do run the risk of possibly not finding the global optimal.  Nevertheless, as mentioned earlier, we will solve the customized functions with non-linear methods to highlight the benefits of this approach.
 
 <br>
 
 ## Gratitude & References
 
-If you want more detailed information about the topics discussed in this article, please check out Matt Dancho's **[Learning Labs Pro: 15 & 16](<https://university.business-science.io/p/learning-labs-pro>)**.  If you are not a Learning Lab Pro member and you love R or data science, you should definitely subscribe.  As a disclaimer, I have no affiliation with BSU, I am just an avid student and huge fan.   
+If you want more detailed information about the topics discussed in this article, please check out Matt Dancho's **[Learning Labs Pro: 15 & 16](<https://university.business-science.io/p/learning-labs-pro>)**.  If you are not a Learning Lab Pro member and you love R or data science, you should definitely subscribe.  As a disclaimer, I have no affiliation with BSU, I am just an avid student and a huge fan.   
 
 <br>
 
@@ -69,28 +73,21 @@ library(tidyverse)
 
 ## Part 1 | Section 1: Calculate Minimum Final Exam Score for History Class
 
-Remember, our goal is to find the lowest final exam score needed in order to get an overall B grade (80%).  Our overall grade in the class is currently 90%, and we have not taken the final exam.  The assignments are worth 50% of the grading weight and the final exam is also 50% of the grading weight.
+Remember, our goal is to find the lowest possible final exam score that will still allow us to get a B.  To date, our overall class grade sits at 90% (45 pnts out of 50).  The weight of the final exam is 50%.  Therefore, we can score **as low as a 70% on the final exam** and still achieve a B in our overall class grade.  See summary of the math below.
 
-The current grades and summary stats are below:
+(**90%** assignment total score x **0.50** wt) + (**70%** final exam score x **0.50** wt) = **80%** overall grade ~ **B**
+
+The current grades and summary stats are below.  We will use this raw data to set up our functions later on.
 
 * Assignment #1: 12 pnts out of 15 ~  80%  
 * Assignment #2: 20 pnts out of 20 ~ 100%  
 * Assignment #3: 13 pnts out of 15 ~  87%  
-<hr>  
-* **Current Grade Summary: 45 points out of 50 ~ 90%**
+
 <hr>
-* **Final Exam: unknown score out of 50 pnts**
-<hr>
-
-Without using a calculator, we know that the minimum score needed on the final exam to receive a B (80% overall) is **70%**.  We can prove it out below.  
-
-(**90%** assignment total score x **0.50** wt) + (**70%** final exam score x **0.50** wt) = **80%** overall grade ~ **B**
-
-<br>
 
 ## Part 1 | Section 2: Set Up History Scores in a Tibble
 
-We will set up a data tibble for our current History course scores for the first 3 assignments.
+We will set up a data tibble for our current History course scores for the first 3 assignments.  Remember, the total points earned was a total of 45 out of 50 points.  
 
 ```{r}
 history_current_grade_tbl <- tibble(
@@ -117,21 +114,28 @@ Next, we will set up a customized function that will allow us to pass through an
 ```{r}
 calc_Final_Exam_Points <- function(Pnts_Earned_Final_Exam) {
   history_current_grade_tbl %>%
+    
     # Sum up current points earned and sum up all current possible points
     summarise(Pnts_Earned_sum   = sum(Pnts_Earned),
               Pnts_Possible_sum = sum(Pnts_Possible)) %>%
+    
     # Add Unknown Final Exam Pnts Earned to Current Pnts Earned
     mutate(Total_Pnts_Earned = Pnts_Earned_Final_Exam + Pnts_Earned_sum) %>%
+    
     # Add Final Exam Possible Possible Pnts to Current Possible Pnts
     mutate(Total_Pnts_Possible = Pnts_Possible_Final_Exam + Pnts_Possible_sum) %>%
+    
     # Calculate Total Grade for Class
     mutate(Final_Class_Grade = Total_Pnts_Earned/Total_Pnts_Possible) %>%
+    
     # Pull out Final Class Grade
     pull(Final_Class_Grade)
 }
 ```
 
-When we plug in **35 final exam pnts earned**, the final grade that is calculated equals **80%**.  In other words, we would need a **70% on the final** (35 pnts earned / 50 pnts possible) to get an overall score of 80%.  Therefore, we know the function is working properly.
+When we plug in **35 final exam pnts earned** into the function below, the final grade equals **80%**.  
+
+In other words, we would need a **70% on the final** (35 pnts earned / 50 pnts possible) to get an overall score of 80%.  Therefore, we know the function is working properly.
 
 ```{r}
 calc_Final_Exam_Points(35)
@@ -141,7 +145,9 @@ calc_Final_Exam_Points(35)
 
 ## Part 1 | Section 4: Set Up a Single Data Set Optimization Objective
 
-We still have not techically solved this problem using a solver solution.  Therefore, let's assume we didn't know the answer and we needed to **solve programmatically**.  The number of outputs we will receive from the solver function equals one (1), so we will set our n variable = 1.  We also know we want to achieve an 80% overall grade, so we can set that variable up as well.
+We still have not techically solved this problem using a solver solution.  At this point, we have only created a function that allows us to calculate our scores manually with a customized function.  
+
+Therefore, let's assume we didn't know the answer and we needed to **solve programmatically**.  The number of outputs we will receive from the solver function equals one (1), so we will set our n variable = 1.  We also know we want to achieve an 80% overall grade, so we can set that variable up as well.
 
 ```{r}
 n <- 1
@@ -159,6 +165,7 @@ Next, we will create a function that is described in detail below.
 ```{r}
 single_data_set_optimization <- function(data = data) {
 
+  # Set up solver (think of Excel's Solver Add-in)
   final_exam_grade_nlp <- OP(
     objective   = F_objective(F = calc_Final_Exam_Points, n = n, names = "Pnts_Earned_Final_Exam"),
     constraints = rbind(
@@ -167,8 +174,10 @@ single_data_set_optimization <- function(data = data) {
     maximum = FALSE
   )
   
+  # Solve for optimal solution
   sol <- ROI_solve(final_exam_grade_nlp, solver = "alabama", start = rep(1/n, n))
   
+  # Return the optimal solution results in a tidy tibble format
   return(
     bind_cols(
       tibble(Final_Grade_Perc  = calc_Final_Exam_Points(sol$solution)),
@@ -193,16 +202,16 @@ The formatted tibble returns the appropriate results we expected when calculatin
 
 <hr>
 
-## Part 2 | Section 1: Calculate Minimum Final Exam Score for All Classes
+## Part 2 | Section 1: Calculate Minimum Final Exam Score for All Four Classes
 
-In Part 2, we will now explore how to calculate the minimum final exam scores needed to get Bs in all four courses: *History, Science, Math & English*.  A summary of our current grades to date are listed below.  
+In Part 2, we will now explore how to calculate the minimum final exam scores needed to get Bs in all four courses: **History, Science, Math & English**.  A summary of our current grades to date are listed below.  
 
-To keep the examples simple, we assume there has only been 3 assignments in each of the 4 classes, and all four final exams are worth 50 points.  
+To keep the examples simple, we assume only been 3 assignments have been given in each of the 4 classes, and all four final exams are worth 50 points.  
 
-* History Current Grade: 90% (45.0 pnts out of 50)  
-* Science Current Grade: 87% (43.5 pnts out of 50)
-* Math Current Grade:    76% (38.0 pnts out of 50)  
-* English Current Grade: 68% (34.0 pnts out of 50)
+* Current History Grade: 90% (45.0 pnts out of 50)  
+* Current Science Grade: 87% (43.5 pnts out of 50)
+* Current Math Grade:    76% (38.0 pnts out of 50)  
+* Current English Grade: 68% (34.0 pnts out of 50)
 
 <br>
 
@@ -225,7 +234,7 @@ all_subjects_current_grade_tbl
 
 ## Part 2 | Section 3: Set Up Nested Tibble
 
-One incredible functionality in R is the ability to nest() data that allows you to apply functions across multiple data sets independently.  To describe it differently, if we scored really well on our Math final, it would not affect our Science grade at all.  To account for the various independent data sets, we set up a nested tibble which includes the same information in the tibble above.
+One incredible functionality in R is the ability to nest() data sets.  Nesting gives you the ability to apply functions across multiple data sets independently.  In other words, think of it as a loop that allows you to perform functions on one set of data, print some results, and repeat these steps on other data sets.  To account for the various independent data sets, we set up a nested tibble which includes the same information in the tibble above.
 
 ```{r}
 all_subjects_current_grade_nested_tbl <- all_subjects_current_grade_tbl %>%
@@ -235,7 +244,7 @@ all_subjects_current_grade_nested_tbl <- all_subjects_current_grade_tbl %>%
 all_subjects_current_grade_nested_tbl
 ```
 
-We will apply the optimization function we created in Part 1 to the nested data that will allow us to calculate an optimal score for **all four final exams independently**.  Think of this as a loop that will calculate the History optimal score, print some results, and then go on to the other subjects and do the same until all four scores are calculated.  
+We will apply the optimization function we created in Part 1 to the nested data that will allow us to calculate an optimal score for **all four final exams independently**.  
 
 For more information about nested functions and mapping, please check out **[R for Data Science](<https://r4ds.had.co.nz/many-models.html>)**.
 
@@ -258,19 +267,25 @@ all_subjects_nested_model <- function(nested_tbl) {
   calc_Final_Exam_Points <- function(Pnts_Earned_Final_Exam) {
     
     nested_tbl %>%
+      
       # Sum up current points earned and sum up all current possible points
       summarise(Pnts_Earned_sum = sum(Pnts_Earned),
                 Pnts_Possible_sum = sum(Pnts_Possible)) %>%
+      
       # Add Unknown Final Exam Pnts Earned to Current Pnts Earned
       mutate(Total_Pnts_Earned = Pnts_Earned_Final_Exam + Pnts_Earned_sum) %>%
+      
       # Add Final Exam Possible Possible Pnts to Current Possible Pnts
       mutate(Total_Pnts_Possible = Pnts_Possible_Final_Exam + Pnts_Possible_sum) %>%
+      
       # Calculate Total Grade for Class
       mutate(Final_Class_Grade = Total_Pnts_Earned/Total_Pnts_Possible) %>% 
+      
       # Pull out Final Class Grade
       pull(Final_Class_Grade)
   }
   
+  # Set up solver (think of Excel's Solver Add-in)
   final_exam_grade_nlp <- OP(
     objective   = F_objective(F = calc_Final_Exam_Points, n = n, names = "Pnts_Earned_Final_Exam"),
     constraints = rbind(
@@ -279,8 +294,10 @@ all_subjects_nested_model <- function(nested_tbl) {
     maximum = FALSE
   )
   
+  # Solve for optimal solution
   sol <- ROI_solve(final_exam_grade_nlp, solver = "alabama", start = rep(1/n, n))
   
+  # Return the optimal solution results in a tidy tibble format
   return(
     bind_cols(
       tibble(Final_Grade_Perc  = calc_Final_Exam_Points(sol$solution)),
@@ -294,12 +311,15 @@ all_subjects_nested_model <- function(nested_tbl) {
 
 Now all we have to do is map the all_subjects_nested_model() function to the nested data set and unnest() the results.  The final results are listed below in a nice tidy format.
 
-```{r}
+```{r, warning=FALSE}
 receive_all_Bs_summary_tbl <- all_subjects_current_grade_nested_tbl %>% 
   mutate(model = map(data, all_subjects_nested_model)) %>%
   select(Subject, model) %>%
   unnest()
+```
 
+Let's take a look at the final results for all 4 classes.
+```{r}
 glimpse(receive_all_Bs_summary_tbl)
 ```
 
@@ -314,9 +334,9 @@ In summary, we would need to get the following minimum final exam scores in orde
 
 ## Part 2 | Section 5: Calculate Score Needed to Get All As
 
-Since we created dynamic functions and variables, we can also see if it is feasible to get a 90% or an A in every course by changing the final_grade variable to 0.90.  And then all we need to do is re-run the same function and print the results.
+Since we took the time and effort to set up dynamic functions and variables, we can also see if it is feasible to get a 90% or an A in every course by changing the final_grade variable to 0.90.  And then all we need to do is re-run the same function and print the results.  
 
-```{r}
+```{r, warning=FALSE}
 final_grade <- 0.90
 
 receive_all_As_summary_tbl <- all_subjects_current_grade_nested_tbl %>% 
@@ -327,7 +347,7 @@ receive_all_As_summary_tbl <- all_subjects_current_grade_nested_tbl %>%
 glimpse(receive_all_As_summary_tbl)
 ```
 
-In summary, we would need to get the following minimum final exam scores in order to get all **As** on our report card for all four subjects.  
+We would need to get the following minimum final exam scores in order to get all **As** on our report card for all four subjects.  
 
 * History Final Exam Score ~ 90%  
 * Science Final Exam Score ~ 93%
@@ -338,9 +358,9 @@ Unfortunately, unless extra credit was given on the Math and English exams, we c
 
 ## Summary and Final Thoughts
 
-The examples presented are not especially difficult to solve manually or by using Excel's solver since both problems presented are technically linear and very simple in nature.  Linear problems are often easier to understand compared to non-linear.  
+The examples presented are not especially difficult to solve manually or by using Excel's solver. Both problems presented are technically linear and very simple in nature.  Linear problems are often easier to understand compared to non-linear.  
 
-However, I personally believe in this non-linear and functional setup approach since I think non-linear problems are more likely presented in the wild.  Non-linear problems allow for conditions (if-then statements) to be set up in the functions that also adds another layer of flexibility to the optimization solutions. 
+However, I personally believe in this non-linear and functional setup approach since non-linear problems are more likely presented in the wild.  Non-linear problems allow for conditions (if-then statements) to be set up in the functions that also adds another layer of flexibility to the optimization solutions. 
 
 Although the functions and the setup may seem like a lot to absorb, I truly believe the power comes from the ability to pass multiple data sets through one function multiple times to get multiple solutions.  I hope you found some value in this article.
 
