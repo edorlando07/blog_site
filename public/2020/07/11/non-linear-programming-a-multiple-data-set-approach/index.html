@@ -66,7 +66,7 @@
 
   <article class="article">
     
-    <span class="article-duration">14 min read</span>
+    <span class="article-duration">15 min read</span>
     
 
     <h1 class="article-title">Non-Linear Programming: A Multiple Data Set Approach</h1>
@@ -94,10 +94,18 @@
 </div>
 <div id="r-versus-excel" class="section level2">
 <h2>R Versus Excel</h2>
-<p>Although it is also feasible to set up 4 similarly structured optimization problems and solve each one independently in Excel, it might not be feasible or efficient to solve 100 similarly structured optimization problems without a more powerful engine.</p>
-<p>If you are an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get <strong>bogged down</strong> and retrieving all the output information might become <strong>tedious</strong> and <strong>error prone</strong>.</p>
-<p>In addition, although Excel’s linear solver solutions are very accurate compared to other software, Excel’s non-linear programming solutions often do not find the global optimal. Excel’s non-linear solutions are sometimes 10-20% less optimal compared to more mature solvers.</p>
-<p>To summarise, it may take longer to set up the non-linear code in R, but you will be able to loop through multiple sets easier and get faster and more optimal results.</p>
+<p>Excel’s solver works great on single data sets and would work great to solve the minimum final exam grade needed to achieve a B in History. In fact, you could hypothetically set up 4 different solvers on 4 different tabs for all four courses and solve each of the independently fairly quickly as well.</p>
+<p>However, consider these questions.</p>
+<ul>
+<li>How efficient is Excel if we had to solve for 100 different data sets?<br />
+</li>
+<li>How do we update our tabs in Excel if our data changes? For example, what if another assignment is graded?<br />
+</li>
+<li>Why does Excel return a local solution that is 20% less optimal compared to R?</li>
+</ul>
+<p>Excel may get bogged down and become very inefficient if you had to run 100 solvers independently on 100 tabs - even if you were able to program it using VBA. It is also hard to have new data flow into 100 different tabs efficiently. Lastly, Excel’s non-linear solutions are sometimes 10-20% less optimal compared to more mature solvers.</p>
+<p>However, there are a couple benefits of using Excel alongside R. For starters, the initial setup of a single solver can be performed much quicker in Excel. In addition, it is much easier to understand the problem visually in Excel. For example, you can color cells, highlight summaries, add labels, and much more.</p>
+<p>To summarize, the initial setup for optimization problems should be performed in Excel. However, if you have new data continuously flowing in, or you are solving for multiple data sets, then you should transition your solver into R.</p>
 </div>
 <div id="roi-package-versus-ompr-package" class="section level2">
 <h2>ROI Package versus OMPR Package</h2>
@@ -186,7 +194,7 @@ history_current_grade_tbl</code></pre>
 </div>
 <div id="part-1-section-4-set-up-a-single-data-set-optimization-objective" class="section level2">
 <h2>Part 1 | Section 4: Set Up a Single Data Set Optimization Objective</h2>
-<p>We still have not techically solved this problem using a solver solution. At this point, we have only created a function that allows us to calculate our scores manually with a customized function.</p>
+<p>We still have not technically solved this problem using a solver solution. At this point, we have only created a function that allows us to calculate our scores manually with a customized function.</p>
 <p>Therefore, let’s assume we didn’t know the answer and we needed to <strong>solve programmatically</strong>. The number of outputs we will receive from the solver function equals one (1), so we will set our n variable = 1. We also know we want to achieve an 80% overall grade, so we can set that variable up as well.</p>
 <pre class="r"><code>n &lt;- 1
 final_grade &lt;- 0.80</code></pre>

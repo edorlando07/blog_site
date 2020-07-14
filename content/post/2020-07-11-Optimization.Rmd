@@ -31,13 +31,19 @@ Conditional statements are very common in many business-type optimization proble
 
 ## R Versus Excel
 
-Although it is also feasible to set up 4 similarly structured optimization problems and solve each one independently in Excel, it might not be feasible or efficient to solve 100 similarly structured optimization problems without a more powerful engine.  
+Excel's solver works great on single data sets and would work great to solve the minimum final exam grade needed to achieve a B in History.  In fact, you could hypothetically set up 4 different solvers on 4 different tabs for all four courses and solve each of the independently fairly quickly as well.  
 
-If you are an Excel guru, you might be able to set up some VBA to run all 100 optimization problems at the same time, but Excel might get **bogged down** and retrieving all the output information might become **tedious** and **error prone**.  
+However, consider these questions.  
 
-In addition, although Excel's linear solver solutions are very accurate compared to other software, Excel's non-linear programming solutions often do not find the global optimal.  Excel's non-linear solutions are sometimes 10-20% less optimal compared to more mature solvers.
+* How efficient is Excel if we had to solve for 100 different data sets?  
+* How do we update our tabs in Excel if our data changes?  For example, what if another assignment is graded?  
+* Why does Excel return a local solution that is 20% less optimal compared to R? 
 
-To summarise, it may take longer to set up the non-linear code in R, but you will be able to loop through multiple sets easier and get faster and more optimal results.
+Excel may get bogged down and become very inefficient if you had to run 100 solvers independently on 100 tabs - even if you were able to program it using VBA.  It is also hard to have new data flow into 100 different tabs efficiently.  Lastly, Excel's non-linear solutions are sometimes 10-20% less optimal compared to more mature solvers.
+
+However, there are a couple benefits of using Excel alongside R.  For starters, the initial setup of a single solver can be performed much quicker in Excel.  In addition, it is much easier to understand the problem visually in Excel.  For example, you can color cells, highlight summaries, add labels, and much more.  
+
+To summarize, the initial setup for optimization problems should be performed in Excel.  However, if you have new data continuously flowing in, or you are solving for multiple data sets, then you should transition your solver into R. 
 
 ## ROI Package versus OMPR Package
 
@@ -145,7 +151,7 @@ calc_Final_Exam_Points(35)
 
 ## Part 1 | Section 4: Set Up a Single Data Set Optimization Objective
 
-We still have not techically solved this problem using a solver solution.  At this point, we have only created a function that allows us to calculate our scores manually with a customized function.  
+We still have not technically solved this problem using a solver solution.  At this point, we have only created a function that allows us to calculate our scores manually with a customized function.  
 
 Therefore, let's assume we didn't know the answer and we needed to **solve programmatically**.  The number of outputs we will receive from the solver function equals one (1), so we will set our n variable = 1.  We also know we want to achieve an 80% overall grade, so we can set that variable up as well.
 
